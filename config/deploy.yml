@@ -1,5 +1,5 @@
 # Name of your application. Used to uniquely configure containers.
-service: tvsearch
+service: tvsearc
 
 # Name of the container image.
 image: ryanwilliamsdocker/tvsearch

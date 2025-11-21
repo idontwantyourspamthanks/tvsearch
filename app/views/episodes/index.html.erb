@@ -22,7 +22,7 @@
       <ul class="episode-list">
         <% @episodes.each do |episode| %>
           <li class="episode-card">
-            <%= link_to episode_path(episode) do %>
+            <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
               <div class="episode-meta">
                 <span class="eyebrow"><%= episode.show&.name %></span>
                 <strong><%= episode.title %></strong>
