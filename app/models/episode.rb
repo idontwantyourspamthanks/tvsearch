@@ -7,6 +7,7 @@ class Episode < ApplicationRecord
 
   validates :title, presence: true
   validates :season_number, :episode_number, numericality: { allow_nil: true, greater_than: 0 }
+  validates :tvdb_id, uniqueness: true, allow_nil: true
 
   scope :recent_first, -> { order(aired_on: :desc, season_number: :desc, episode_number: :desc) }
   scope :by_show_episode, lambda {

@@ -36,12 +36,7 @@ class Admin::TvdbImportsController < ApplicationController
     show_name = params[:show_name].presence || "Series #{series_id}"
     show_description = params[:show_description]
 
-    show = Show.find_or_create_by!(name: show_name) do |s|
-      s.description = show_description
-    end
-    if show_description.present? && show.description.blank?
-      show.update(description: show_description)
-    end
+    show = find_or_prepare_show(series_id, show_name, show_description)
 
     response = client.episodes_page(series_id, page:)
     result = import_batch(show, response[:episodes])
@@ -74,7 +69,7 @@ class Admin::TvdbImportsController < ApplicationController
       next unless attrs[:title].present?
 
       episode = find_matching_episode(show, attrs)
-      episode.assign_attributes(attrs)
+      apply_episode_attributes(episode, attrs)
 
       status =
         if episode.new_record?
@@ -91,6 +86,11 @@ class Admin::TvdbImportsController < ApplicationController
 
   def find_matching_episode(show, attrs)
     scope = show.episodes
+    if attrs[:tvdb_id].present?
+      matched = scope.find_by(tvdb_id: attrs[:tvdb_id])
+      return matched if matched
+    end
+
     if attrs[:season_number].present? && attrs[:episode_number].present?
       matched = scope.find_by(season_number: attrs[:season_number], episode_number: attrs[:episode_number])
       return matched if matched
@@ -117,6 +117,7 @@ class Admin::TvdbImportsController < ApplicationController
 
     {
       show:,
+      tvdb_id: tvdb_episode_id(data),
       title: data["name"] || data["episodeName"] || data.dig("translations", "eng", "name"),
       season_number: data["seasonNumber"] || data["airedSeason"],
       episode_number: data["number"] || data["episodeNumber"] || data["airedEpisodeNumber"],
@@ -125,9 +126,43 @@ class Admin::TvdbImportsController < ApplicationController
     }
   end
 
+  def tvdb_episode_id(data)
+    value = data["id"] || data["tvdb_id"]
+    return unless value.present?
+
+    value.to_i
+  end
+
   def parse_date(value)
     Date.parse(value) if value.present?
   rescue ArgumentError
     nil
+  end
+
+  def find_or_prepare_show(series_id, show_name, show_description)
+    tvdb_id = series_id.to_i
+    tvdb_id = nil if tvdb_id.zero? && series_id.blank?
+
+    show = tvdb_id ? Show.find_by(tvdb_id:) : nil
+    show ||= Show.find_or_initialize_by(name: show_name)
+
+    show.tvdb_id = tvdb_id if show.tvdb_id.blank? && tvdb_id.present?
+    show.description = show_description if show.description.blank? && show_description.present?
+    show.save! if show.new_record? || show.changed?
+    show
+  end
+
+  def apply_episode_attributes(episode, attrs)
+    return episode.assign_attributes(attrs) if episode.new_record?
+
+    safe_attrs = attrs.each_with_object({}) do |(key, value), memo|
+      next if key == :show
+      next if value.blank?
+
+      current_value = episode.public_send(key)
+      memo[key] = value if current_value.blank?
+    end
+
+    episode.assign_attributes(safe_attrs)
   end
 end

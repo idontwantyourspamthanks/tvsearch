@@ -1,5 +1,7 @@
 This is a Rails/Hotwire application. It fetches TV episode data from TVDB (see https://thetvdb.github.io/v4-api for details) and uses that to populate an internal database - we can then add extra information to this.
 
+You will update this documentation as you make changes to things.
+
 ## TVDB Import Flow
 
 This documents how we fetch and import data from TVDB so future changes are easier.
@@ -24,8 +26,9 @@ This documents how we fetch and import data from TVDB so future changes are easi
      - GET `/series/<series_id>/episodes/default?page=<page>`.
      - Response body uses either `data: [...]` or `data: { episodes: [...] }`.
      - Pagination info comes from `links` (`next`, `last`, `first`); we return `next_page` (integer or `nil`) and `total_pages`.
-   - Import logic maps each episode hash to attributes: `name`/`episodeName`/`translations.eng.name`, `seasonNumber`/`airedSeason`, `number`/`episodeNumber`/`airedEpisodeNumber`, `overview`/`description`/`translations.eng.overview`, `aired`.
-   - Episodes are matched by season/episode if present, otherwise by downcased title; we mark status per row: `created`, `updated`, `unchanged`, or `skipped` (validation failure).
+   - Import logic maps each episode hash to attributes: `tvdb_id` (`id`), `name`/`episodeName`/`translations.eng.name`, `seasonNumber`/`airedSeason`, `number`/`episodeNumber`/`airedEpisodeNumber`, `overview`/`description`/`translations.eng.overview`, `aired`.
+   - Shows now store `tvdb_id`; lookup prefers `tvdb_id`, then name. Episodes likewise try `tvdb_id`, then season/episode, then title.
+   - For existing episodes we only fill blank fields (including `tvdb_id`) so user edits are preserved; show description is only set if blank.
    - Batch response JSON: `{ page, next_page, total_pages, created, updated, unchanged, skipped, entries: [{ title, season_number, episode_number, aired_on, status }] }`.
    - Stimulus updates the progress bar and counter text and stops when `next_page` is `null`.
 
