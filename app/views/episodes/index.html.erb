@@ -25,9 +25,12 @@
             <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
               <div class="episode-meta">
                 <span class="eyebrow"><%= episode.show&.name %></span>
-                <strong><%= episode.title %></strong>
+                <strong><%= highlight_query(episode.title, @query) %></strong>
                 <% if episode.alternate_titles.present? %>
-                  <p class="muted small">Also called: <%= episode.alternate_titles.join(", ") %></p>
+                  <p class="muted small">
+                    Also called:
+                    <%= episode.alternate_titles.map { |alt| highlight_query(alt, @query) }.join(", ").html_safe %>
+                  </p>
                 <% end %>
                 <p class="muted">
                   <% if episode.season_number && episode.episode_number %>
@@ -39,7 +42,7 @@
                 </p>
               </div>
               <% if episode.description.present? %>
-                <p class="description"><%= truncate(episode.description, length: 160) %></p>
+                <p class="description"><%= highlight_query(truncate(episode.description, length: 160), @query) %></p>
               <% end %>
             <% end %>
           </li>
