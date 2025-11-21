@@ -37,6 +37,11 @@
     <%= form.text_area :description, rows: 5 %>
   </div>
 
+  <div class="field">
+    <%= form.label :alternate_titles_text, "Alternate titles / nicknames (comma separated)" %>
+    <%= form.text_area :alternate_titles_text, rows: 3 %>
+  </div>
+
   <div class="actions">
     <%= form.submit "Save episode", class: "button" %>
     <%= link_to "Cancel", admin_episodes_path, class: "link" %>

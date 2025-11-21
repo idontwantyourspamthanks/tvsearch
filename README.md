@@ -25,3 +25,4 @@ Things you may want to cover:
 
 # Default admin
 admin@example.com/changeme123 - DO NOT LEAVE THIS AS IT IS
+

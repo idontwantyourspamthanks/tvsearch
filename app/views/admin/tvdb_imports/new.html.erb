@@ -1,0 +1,41 @@
+<% content_for :title, "Import from TVDB" %>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Import from TVDB</h1>
+      <p class="muted">Search a show on TVDB and import all episodes into the catalog.</p>
+    </div>
+  </div>
+
+  <%= form_with url: admin_tvdb_import_path, method: :get, class: "search-form" do |form| %>
+    <div class="search-box">
+      <%= form.search_field :query, value: @query, placeholder: "Search TVDB shows...", autofocus: true %>
+      <%= form.submit "Search" %>
+    </div>
+  <% end %>
+
+  <% if @results.present? %>
+    <div class="table" style="margin-top: 16px;">
+      <div class="table-row table-head">
+        <div>Show</div>
+        <div>Description</div>
+        <div></div>
+      </div>
+      <% @results.each do |result| %>
+        <div class="table-row">
+          <div><strong><%= result["name"] %></strong></div>
+          <div class="muted"><%= truncate(result["overview"].to_s, length: 140) %></div>
+          <div class="table-actions">
+            <%= button_to "Import episodes", admin_tvdb_import_path(series_id: result["tvdb_id"] || result["id"], query: @query), method: :post, form: { data: { turbo_confirm: "Import all episodes for #{result["name"]}?" } } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% elsif @query.present? %>
+    <div class="empty-state">
+      <p>No shows found on TVDB for "<%= @query %>".</p>
+    </div>
+  <% end %>
+</div>

@@ -12,5 +12,7 @@ Rails.application.routes.draw do
     root to: "episodes#index"
     resources :episodes, except: :show
     resources :shows, except: :show
+    get "tvdb_import", to: "tvdb_imports#new", as: :tvdb_import
+    post "tvdb_import", to: "tvdb_imports#create"
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_21_101020) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_21_102748) do
   create_table "admin_users", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -28,6 +28,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_21_101020) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "show_id", null: false
+    t.text "alternate_titles"
     t.index ["show_id"], name: "index_episodes_on_show_id"
     t.index ["title"], name: "index_episodes_on_show_name_and_title"
   end
