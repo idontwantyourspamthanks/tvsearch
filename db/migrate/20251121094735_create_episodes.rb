@@ -11,6 +11,6 @@ class CreateEpisodes < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :episodes, [:show_name, :title]
+    add_index :episodes, [ :show_name, :title ]
   end
 end
