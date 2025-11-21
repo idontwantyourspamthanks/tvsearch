@@ -38,10 +38,4 @@ class Episode < ApplicationRecord
     @alternate_titles_text = value
     self.alternate_titles = value.to_s.split(",").map { |val| val.strip.presence }.compact
   end
-
-  def image_url
-    return nil unless tvdb_id.present? && show&.tvdb_id.present?
-
-    "https://artworks.thetvdb.com/banners/episodes/#{show.tvdb_id}/#{tvdb_id}.jpg"
-  end
 end

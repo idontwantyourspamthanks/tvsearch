@@ -194,7 +194,8 @@ class Admin::TvdbImportsController < ApplicationController
       season_number: data["seasonNumber"] || data["airedSeason"],
       episode_number: data["number"] || data["episodeNumber"] || data["airedEpisodeNumber"],
       description: data["overview"] || data["description"] || data.dig("translations", "eng", "overview"),
-      aired_on: parse_date(data["aired"])
+      aired_on: parse_date(data["aired"]),
+      image_url: extract_image_url(data)
     }
   end
 
@@ -209,6 +210,17 @@ class Admin::TvdbImportsController < ApplicationController
     Date.parse(value) if value.present?
   rescue ArgumentError
     nil
+  end
+
+  def extract_image_url(data)
+    image = data["image"]
+    return nil if image.blank?
+
+    # If it's already a full URL, return it
+    return image if image.start_with?("http://", "https://")
+
+    # Otherwise prepend the TVDB artwork base URL
+    "https://artworks.thetvdb.com#{image}"
   end
 
   def apply_episode_attributes(episode, attrs)

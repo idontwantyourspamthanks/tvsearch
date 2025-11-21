@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_21_120000) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_22_000000) do
   create_table "admin_users", force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -30,6 +30,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_21_120000) do
     t.integer "show_id", null: false
     t.text "alternate_titles"
     t.bigint "tvdb_id"
+    t.string "image_path"
+    t.datetime "image_updated_at"
+    t.string "image_url"
+    t.index ["image_updated_at"], name: "index_episodes_on_image_updated_at"
     t.index ["show_id"], name: "index_episodes_on_show_id"
     t.index ["title"], name: "index_episodes_on_show_name_and_title"
     t.index ["tvdb_id"], name: "index_episodes_on_tvdb_id", unique: true

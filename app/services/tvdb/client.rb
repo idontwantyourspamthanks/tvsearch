@@ -172,10 +172,16 @@ module Tvdb
 
     def extract_episodes(response)
       data = response["data"]
-      return data["episodes"] if data.is_a?(Hash) && data["episodes"].is_a?(Array)
-      return data if data.is_a?(Array)
+      episodes = []
 
-      []
+      if data.is_a?(Hash) && data["episodes"].is_a?(Array)
+        episodes = data["episodes"]
+      elsif data.is_a?(Array)
+        episodes = data
+      end
+
+      # Ensure each episode has an image field (some API responses include it, some don't)
+      episodes
     end
 
     def total_pages_from_links(links)
