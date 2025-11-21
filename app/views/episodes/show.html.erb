@@ -17,6 +17,12 @@
       <% end %>
     </p>
 
+    <% if @episode.image_url %>
+      <div class="episode-image">
+        <%= image_tag @episode.image_url, alt: @episode.title, loading: "lazy" %>
+      </div>
+    <% end %>
+
     <% if @episode.description.present? %>
       <div class="description">
         <%= simple_format(@episode.description) %>
