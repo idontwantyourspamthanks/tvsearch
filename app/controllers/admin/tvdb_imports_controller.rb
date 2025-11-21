@@ -108,8 +108,6 @@ class Admin::TvdbImportsController < ApplicationController
         if episode.save
           status = :created
           reason = nil
-          # Download image after creating episode
-          EpisodeImageDownloader.download(episode) if episode.image_url.present?
         else
           status = :skipped
           reason = episode.errors.full_messages.join(", ")
@@ -118,8 +116,6 @@ class Admin::TvdbImportsController < ApplicationController
         if episode.save
           status = :updated
           reason = "Updated: #{episode.previous_changes.keys.join(', ')}"
-          # Download image after updating episode if image_url changed
-          EpisodeImageDownloader.download(episode) if episode.previous_changes.key?("image_url") && episode.image_url.present?
         else
           status = :skipped
           reason = episode.errors.full_messages.join(", ")
@@ -127,8 +123,12 @@ class Admin::TvdbImportsController < ApplicationController
       else
         status = :unchanged
         reason = "Already up to date"
-        # Download image even if episode unchanged, if we don't have a cached image yet
-        EpisodeImageDownloader.download(episode) if episode.image_url.present? && episode.image_path.blank?
+      end
+
+      # Always try to download image if we have a URL but no cached file
+      if episode.persisted? && episode.image_url.present? && episode.image_path.blank?
+        download_success = EpisodeImageDownloader.download(episode)
+        Rails.logger.info "Image download for episode #{episode.id}: #{download_success ? 'SUCCESS' : 'FAILED'}"
       end
 
       { episode:, status:, reason: }
