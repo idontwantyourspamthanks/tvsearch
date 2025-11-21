@@ -1,0 +1,48 @@
+<% content_for :title, "Admin · Episodes" %>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Episodes</h1>
+      <p class="muted">Manage the subset of episodes that are available to search publicly.</p>
+    </div>
+    <div class="actions">
+      <%= link_to "New episode", new_admin_episode_path, class: "button" %>
+    </div>
+  </div>
+
+  <% if @episodes.any? %>
+    <div class="table">
+      <div class="table-row table-head">
+        <div>Show</div>
+        <div>Episode</div>
+        <div>Aired</div>
+        <div></div>
+      </div>
+      <% @episodes.each do |episode| %>
+        <div class="table-row">
+          <div><strong><%= episode.show&.name %></strong></div>
+          <div>
+            <div><%= episode.title %></div>
+            <div class="muted">
+              <% if episode.season_number && episode.episode_number %>
+                S<%= episode.season_number %> · E<%= episode.episode_number %>
+              <% end %>
+            </div>
+          </div>
+          <div class="muted"><%= episode.aired_on&.to_fs(:long) || "–" %></div>
+          <div class="table-actions">
+            <%= link_to "Edit", edit_admin_episode_path(episode) %>
+            <%= button_to "Delete", admin_episode_path(episode), method: :delete, data: { turbo_confirm: "Delete this episode?" }, class: "link-button" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p>No episodes yet.</p>
+      <p class="muted">Add a few to make the public search feel useful.</p>
+    </div>
+  <% end %>
+</div>

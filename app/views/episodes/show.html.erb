@@ -1,0 +1,26 @@
+<% content_for :title, @episode.title %>
+
+<div class="page">
+  <div class="back-link">
+    <%= link_to "← Back to search", root_path %>
+  </div>
+
+  <article class="episode-detail">
+    <p class="eyebrow"><%= @episode.show&.name %></p>
+    <h1><%= @episode.title %></h1>
+    <p class="muted">
+      <% if @episode.season_number && @episode.episode_number %>
+        Season <%= @episode.season_number %>, Episode <%= @episode.episode_number %>
+      <% end %>
+      <% if @episode.aired_on %>
+        · Aired <%= @episode.aired_on.to_fs(:long) %>
+      <% end %>
+    </p>
+
+    <% if @episode.description.present? %>
+      <div class="description">
+        <%= simple_format(@episode.description) %>
+      </div>
+    <% end %>
+  </article>
+</div>

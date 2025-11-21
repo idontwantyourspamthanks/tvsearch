@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  show: office
+  title: Dinner Party
+  season_number: 4
+  episode_number: 13
+  description: Awkward dinner
+  aired_on: 2008-04-10
+
+two:
+  show: breaking_bad
+  title: Ozymandias
+  season_number: 5
+  episode_number: 14
+  description: Desert showdown
+  aired_on: 2013-09-15

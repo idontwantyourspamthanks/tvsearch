@@ -1,0 +1,39 @@
+<% content_for :title, "Admin · Shows" %>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Shows</h1>
+      <p class="muted">Manage the list of shows available for episodes.</p>
+    </div>
+    <div class="actions">
+      <%= link_to "New show", new_admin_show_path, class: "button" %>
+    </div>
+  </div>
+
+  <% if @shows.any? %>
+    <div class="table">
+      <div class="table-row table-head">
+        <div>Name</div>
+        <div>Description</div>
+        <div></div>
+      </div>
+      <% @shows.each do |show| %>
+        <div class="table-row">
+          <div><strong><%= show.name %></strong></div>
+          <div class="muted"><%= truncate(show.description.to_s, length: 120) %></div>
+          <div class="table-actions">
+            <%= link_to "Edit", edit_admin_show_path(show) %>
+            <%= button_to "Delete", admin_show_path(show), method: :delete, data: { turbo_confirm: "Delete this show? Episodes will be removed." }, class: "link-button" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p>No shows yet.</p>
+      <p class="muted">Add shows before adding episodes.</p>
+    </div>
+  <% end %>
+</div>

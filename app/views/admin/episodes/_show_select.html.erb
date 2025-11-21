@@ -1,0 +1,9 @@
+<turbo-frame id="show_select">
+  <div class="field">
+    <%= label_tag :episode_show_id, "Show" %>
+    <div class="combobox">
+      <%= collection_select(:episode, :show_id, Show.order(:name), :id, :name, { prompt: "Select a show" }, { required: true }) %>
+      <%= link_to "Add show", new_admin_show_path, data: { turbo_frame: "modal" }, class: "link small" %>
+    </div>
+  </div>
+</turbo-frame>

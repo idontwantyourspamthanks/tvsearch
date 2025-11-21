@@ -1,0 +1,22 @@
+<% content_for :title, "Admin login" %>
+
+<div class="page small">
+  <h1>Admin login</h1>
+  <p class="muted">Only admins can manage the catalog of episodes.</p>
+
+  <%= form_with url: admin_login_path, class: "stack" do |form| %>
+    <div class="field">
+      <%= form.label :email %>
+      <%= form.email_field :email, required: true, autofocus: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password %>
+      <%= form.password_field :password, required: true %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit "Sign in", class: "button" %>
+    </div>
+  <% end %>
+</div>

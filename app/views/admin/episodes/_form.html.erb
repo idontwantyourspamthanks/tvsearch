@@ -1,0 +1,44 @@
+<%= form_with model: [:admin, @episode], class: "stack" do |form| %>
+  <% if @episode.errors.any? %>
+    <div class="alert">
+      <strong><%= pluralize(@episode.errors.count, "error") %> prevented saving:</strong>
+      <ul>
+        <% @episode.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= render "show_select" %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="field inline">
+    <div>
+      <%= form.label :season_number %>
+      <%= form.number_field :season_number, min: 1 %>
+    </div>
+    <div>
+      <%= form.label :episode_number %>
+      <%= form.number_field :episode_number, min: 1 %>
+    </div>
+    <div>
+      <%= form.label :aired_on %>
+      <%= form.date_field :aired_on %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description, rows: 5 %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Save episode", class: "button" %>
+    <%= link_to "Cancel", admin_episodes_path, class: "link" %>
+  </div>
+<% end %>

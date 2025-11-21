@@ -1,0 +1,51 @@
+<% content_for :title, "Episode finder" %>
+
+<div class="page">
+  <section class="hero">
+    <p class="eyebrow">TV episode finder</p>
+    <h1>Search a curated set of episodes</h1>
+    <p class="lede">Type a show name, episode title, or a plot detail to look up the episodes we currently track.</p>
+
+    <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results" }, class: "search-form" do |form| %>
+      <div class="search-box">
+        <%= form.label :q, "Search", class: "sr-only" %>
+        <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true %>
+        <%= form.submit "Search" %>
+      </div>
+      <p class="hint">Hit enter to refresh the list instantly.</p>
+    <% end %>
+  </section>
+
+  <turbo-frame id="episode_results">
+    <% if @episodes.any? %>
+      <ul class="episode-list">
+        <% @episodes.each do |episode| %>
+          <li class="episode-card">
+            <%= link_to episode_path(episode) do %>
+              <div class="episode-meta">
+                <span class="eyebrow"><%= episode.show&.name %></span>
+                <strong><%= episode.title %></strong>
+                <p class="muted">
+                  <% if episode.season_number && episode.episode_number %>
+                    S<%= episode.season_number %> · E<%= episode.episode_number %>
+                  <% end %>
+                  <% if episode.aired_on %>
+                    · <%= episode.aired_on.to_fs(:long) %>
+                  <% end %>
+                </p>
+              </div>
+              <% if episode.description.present? %>
+                <p class="description"><%= truncate(episode.description, length: 160) %></p>
+              <% end %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty-state">
+        <p>No episodes match that search yet.</p>
+        <p class="muted">Try a different keyword or ask the admin to add more titles.</p>
+      </div>
+    <% end %>
+  </turbo-frame>
+</div>

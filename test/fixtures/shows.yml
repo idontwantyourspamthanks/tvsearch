@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+office:
+  name: The Office
+  description: Workplace mockumentary
+
+breaking_bad:
+  name: Breaking Bad
+  description: Chemistry teacher turns to crime
