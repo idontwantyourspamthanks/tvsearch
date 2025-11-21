@@ -27,19 +27,28 @@ module Tvdb
       episodes = []
 
       loop do
-        response = get("/series/#{series_id}/episodes/default", { page: page })
-        data = extract_episodes(response)
+        response = episodes_page(series_id, page:)
+        data = response[:episodes]
         break if data.empty?
 
         episodes.concat(data)
 
-        next_page = response.dig("links", "next")
+        next_page = response[:next_page]
         break unless next_page
 
         page = next_page
       end
 
       episodes
+    end
+
+    def episodes_page(series_id, page: 0)
+      response = get("/series/#{series_id}/episodes/default", { page: page })
+      {
+        episodes: extract_episodes(response),
+        next_page: response.dig("links", "next"),
+        total_pages: total_pages_from_links(response["links"])
+      }
     end
 
     private
@@ -90,6 +99,18 @@ module Tvdb
       return data if data.is_a?(Array)
 
       []
+    end
+
+    def total_pages_from_links(links)
+      return unless links.is_a?(Hash)
+
+      last_page = links["last"]
+      return unless last_page
+
+      first_page = links["first"] || 0
+      first_value = first_page.to_i
+      last_value = last_page.to_i
+      (last_value - first_value) + 1
     end
   end
 end
