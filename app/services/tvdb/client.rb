@@ -27,19 +27,28 @@ module Tvdb
       episodes = []
 
       loop do
-        response = get("/series/#{series_id}/episodes/default", { page: page })
-        data = extract_episodes(response)
+        response = episodes_page(series_id, page: page)
+        data = response[:episodes]
         break if data.empty?
 
         episodes.concat(data)
 
-        next_page = response.dig("links", "next")
+        next_page = response[:next_page]
         break unless next_page
 
         page = next_page
       end
 
       episodes
+    end
+
+    def episodes_page(series_id, page: 0)
+      response = get("/series/#{series_id}/episodes/default", { page: page })
+      {
+        episodes: extract_episodes(response),
+        next_page: parse_next_page(response["links"]),
+        total_pages: total_pages_from_links(response["links"])
+      }
     end
 
     private
@@ -90,6 +99,45 @@ module Tvdb
       return data if data.is_a?(Array)
 
       []
+    end
+
+    def total_pages_from_links(links)
+      return unless links.is_a?(Hash)
+
+      last_page = links["last"]
+      return unless last_page
+
+      first_page = links["first"] || 0
+      first_value = first_page.to_i
+      last_value = last_page.to_i
+      (last_value - first_value) + 1
+    end
+
+    def parse_next_page(links)
+      return nil unless links.is_a?(Hash)
+
+      next_link = links["next"]
+      return nil if next_link.nil?
+
+      # If it's already an integer, return it
+      return next_link if next_link.is_a?(Integer)
+
+      # If it's a string that looks like a number, parse it
+      if next_link.is_a?(String)
+        # Try parsing as integer first
+        page_num = next_link.to_i
+        return page_num if page_num.to_s == next_link
+
+        # Otherwise try to extract page parameter from URL
+        uri = URI.parse(next_link) rescue nil
+        if uri&.query
+          params = URI.decode_www_form(uri.query).to_h
+          return params["page"].to_i if params["page"]
+        end
+      end
+
+      # If we can't parse it, return nil to stop pagination
+      nil
     end
   end
 end

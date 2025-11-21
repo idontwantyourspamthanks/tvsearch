@@ -28,7 +28,7 @@
           <div><strong><%= result["name"] %></strong></div>
           <div class="muted"><%= truncate(result["overview"].to_s, length: 140) %></div>
           <div class="table-actions">
-            <%= button_to "Import episodes", admin_tvdb_import_path(series_id: result["tvdb_id"] || result["id"], query: @query), method: :post, form: { data: { turbo_confirm: "Import all episodes for #{result["name"]}?" } } %>
+            <%= button_to "Import episodes", admin_tvdb_import_path(series_id: result["tvdb_id"] || result["id"], query: @query), method: :post, form: { data: { turbo_confirm: "Import all episodes for #{result["name"]}?", turbo: false } } %>
           </div>
         </div>
       <% end %>

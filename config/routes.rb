@@ -15,5 +15,7 @@ Rails.application.routes.draw do
     resource :password, only: %i[edit update], controller: "passwords"
     get "tvdb_import", to: "tvdb_imports#new", as: :tvdb_import
     post "tvdb_import", to: "tvdb_imports#create"
+    post "tvdb_import/details", to: "tvdb_imports#details", as: :tvdb_import_details
+    post "tvdb_import/batch", to: "tvdb_imports#batch", as: :tvdb_import_batch
   end
 end

@@ -1,0 +1,73 @@
+<% content_for :title, "Importing from TVDB" %>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Importing from TVDB</h1>
+      <p class="muted">Follow the steps below to pull in this series safely.</p>
+    </div>
+    <div class="actions">
+      <%= link_to "Back to TVDB search", admin_tvdb_import_path(query: @query), class: "button" %>
+    </div>
+  </div>
+
+  <div
+    class="import-steps"
+    data-controller="tvdb-import"
+    data-tvdb-import-series-id-value="<%= @series_id %>"
+    data-tvdb-import-query-value="<%= @query %>"
+    data-tvdb-import-details-url-value="<%= admin_tvdb_import_details_path %>"
+    data-tvdb-import-batch-url-value="<%= admin_tvdb_import_batch_path %>"
+  >
+    <div class="import-card">
+      <div class="card-header">
+        <p class="eyebrow">Step 1</p>
+        <h2>Fetch show metadata</h2>
+      </div>
+      <div class="card-body">
+        <p data-tvdb-import-target="metadataStatus">Waiting…</p>
+        <p class="muted small" data-tvdb-import-target="metadataDetail"></p>
+      </div>
+    </div>
+
+    <div class="import-card">
+      <div class="card-header">
+        <p class="eyebrow">Step 2</p>
+        <h2>Fetch and import episodes</h2>
+      </div>
+      <div class="card-body">
+        <div class="progress">
+          <div class="progress-bar" data-tvdb-import-target="progressBar"></div>
+        </div>
+        <p data-tvdb-import-target="episodesStatus">Waiting for metadata…</p>
+        <p class="muted small" data-tvdb-import-target="episodesCounts"></p>
+        <div class="log" data-tvdb-import-target="log">
+          <p class="muted small">No batches yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="import-card">
+      <div class="card-header">
+        <p class="eyebrow">Step 3</p>
+        <h2>Summary</h2>
+      </div>
+      <div class="card-body">
+        <p data-tvdb-import-target="summaryStatus">Waiting for import to finish…</p>
+        <p class="muted small" data-tvdb-import-target="summaryCounts"></p>
+      </div>
+    </div>
+
+    <div class="import-card error-card" data-tvdb-import-target="errorBox" hidden>
+      <div class="card-header">
+        <p class="eyebrow">Error</p>
+        <h2>Something went wrong</h2>
+      </div>
+      <div class="card-body">
+        <p class="muted small">The import stopped with an error. Details below:</p>
+        <pre class="error-log" data-tvdb-import-target="errorMessage"></pre>
+      </div>
+    </div>
+  </div>
+</div>
