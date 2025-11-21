@@ -27,12 +27,14 @@ class Admin::TvdbImportsController < ApplicationController
 
     client = Tvdb::Client.new
     data = client.series_details(series_id)
+    seasons = client.series_seasons(series_id)
 
     render json: {
       series_id:,
       show_name: data["name"] || data["seriesName"] || "Series #{series_id}",
       show_description: data["overview"] || data["description"],
-      tvdb_id: data["id"] || data["tvdb_id"]
+      tvdb_id: data["id"] || data["tvdb_id"],
+      seasons:
     }
   rescue Tvdb::Client::Error => e
     render json: { error: e.message, error_class: e.class.name, detail: e.backtrace&.first }, status: :bad_gateway
@@ -48,15 +50,24 @@ class Admin::TvdbImportsController < ApplicationController
 
     show_name = params[:show_name].presence || "Series #{series_id}"
     show_description = params[:show_description]
+    selected_seasons = params[:selected_seasons] || []
 
     show = find_or_prepare_show(series_id, show_name, show_description)
 
     response = client.episodes_page(series_id, page:)
-    result = import_batch(show, response[:episodes])
+
+    # Filter episodes by selected seasons if specified
+    episodes = response[:episodes]
+    if selected_seasons.any?
+      season_numbers = selected_seasons.map(&:to_i)
+      episodes = episodes.select { |ep| season_numbers.include?(ep["seasonNumber"] || ep["airedSeason"]) }
+    end
+
+    result = import_batch(show, episodes)
 
     render json: {
       page:,
-      fetched: response[:episodes].size,
+      fetched: episodes.size,
       next_page: response[:next_page],
       total_pages: response[:total_pages],
       created: result.count { _1[:status] == :created },

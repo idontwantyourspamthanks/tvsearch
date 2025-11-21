@@ -4,6 +4,9 @@ export default class extends Controller {
   static targets = [
     "metadataStatus",
     "metadataDetail",
+    "seasonsStatus",
+    "seasonsContainer",
+    "continueButton",
     "episodesStatus",
     "episodesCounts",
     "progressBar",
@@ -33,6 +36,8 @@ export default class extends Controller {
 
   connect() {
     this.allResults = []  // Store all episode results for final summary
+    this.seasons = []  // Store available seasons
+    this.selectedSeasons = []  // Store selected season numbers
     this.fetchMetadata()
   }
 
@@ -48,6 +53,7 @@ export default class extends Controller {
   async fetchMetadata() {
     this.metadataStatusTarget.textContent = "Fetching metadata…"
     this.metadataDetailTarget.textContent = ""
+    this.seasonsStatusTarget.textContent = "Waiting for metadata…"
     this.clearError()
 
     try {
@@ -64,19 +70,151 @@ export default class extends Controller {
 
       this.showNameValue = data.show_name
       this.showDescriptionValue = data.show_description
+      this.seasons = data.seasons || []
 
       this.metadataStatusTarget.textContent = `Done · ${data.show_name}`
       if (data.show_description) {
         this.metadataDetailTarget.textContent = data.show_description
       }
 
-      this.episodesStatusTarget.textContent = "Starting import…"
-      this.fetchNextBatch()
+      // Display seasons for selection
+      this.displaySeasons()
     } catch (error) {
       this.metadataStatusTarget.textContent = "Failed to fetch metadata"
       this.metadataDetailTarget.textContent = ""
+      this.seasonsStatusTarget.textContent = "Failed to fetch seasons"
       this.handleError(error)
     }
+  }
+
+  displaySeasons() {
+    if (this.seasons.length === 0) {
+      this.seasonsStatusTarget.textContent = "No seasons found"
+      return
+    }
+
+    this.seasonsStatusTarget.textContent = `Found ${this.seasons.length} season${this.seasons.length !== 1 ? 's' : ''}`
+
+    // Create check all/none buttons
+    const buttonContainer = document.createElement("div")
+    buttonContainer.style.marginBottom = "1rem"
+    buttonContainer.style.display = "flex"
+    buttonContainer.style.gap = "0.5rem"
+
+    const checkAllBtn = document.createElement("button")
+    checkAllBtn.type = "button"
+    checkAllBtn.textContent = "Check All"
+    checkAllBtn.className = "button small"
+    checkAllBtn.addEventListener("click", () => this.toggleAllSeasons(true))
+
+    const checkNoneBtn = document.createElement("button")
+    checkNoneBtn.type = "button"
+    checkNoneBtn.textContent = "Check None"
+    checkNoneBtn.className = "button small"
+    checkNoneBtn.addEventListener("click", () => this.toggleAllSeasons(false))
+
+    buttonContainer.appendChild(checkAllBtn)
+    buttonContainer.appendChild(checkNoneBtn)
+
+    // Create checkbox list
+    const form = document.createElement("div")
+    form.className = "seasons-list"
+    form.style.display = "flex"
+    form.style.flexDirection = "column"
+    form.style.gap = "0.5rem"
+
+    this.seasons.forEach(season => {
+      const label = document.createElement("label")
+      label.style.display = "flex"
+      label.style.alignItems = "center"
+      label.style.gap = "0.5rem"
+      label.style.cursor = "pointer"
+
+      const checkbox = document.createElement("input")
+      checkbox.type = "checkbox"
+      checkbox.value = season.number
+      checkbox.checked = true  // All checked by default
+      checkbox.dataset.seasonNumber = season.number
+      checkbox.className = "season-checkbox"
+
+      const textContainer = document.createElement("div")
+      textContainer.style.flex = "1"
+
+      const nameSpan = document.createElement("strong")
+      nameSpan.textContent = season.name
+      // Don't show type if it's the default "Aired Order" or "Official"
+      if (season.type && season.type !== "Official" && season.type !== "Aired Order") {
+        nameSpan.textContent += ` (${season.type})`
+      }
+
+      textContainer.appendChild(nameSpan)
+
+      // Add metadata (air dates and episode count)
+      const metadata = this.formatSeasonMetadata(season)
+      if (metadata) {
+        const metaSpan = document.createElement("div")
+        metaSpan.className = "muted small"
+        metaSpan.textContent = metadata
+        textContainer.appendChild(metaSpan)
+      }
+
+      label.appendChild(checkbox)
+      label.appendChild(textContainer)
+      form.appendChild(label)
+    })
+
+    this.seasonsContainerTarget.innerHTML = ""
+    this.seasonsContainerTarget.appendChild(buttonContainer)
+    this.seasonsContainerTarget.appendChild(form)
+    this.continueButtonTarget.style.display = "inline-block"
+  }
+
+  formatSeasonMetadata(season) {
+    const parts = []
+
+    // Add year if available
+    const year = season.year
+    if (year) {
+      parts.push(year.toString())
+    }
+
+    // Add episode count if available
+    if (season.episode_count) {
+      parts.push(`${season.episode_count} episodes`)
+    }
+
+    // Add air date range if available
+    if (season.first_aired && season.last_aired) {
+      parts.push(`${season.first_aired} - ${season.last_aired}`)
+    } else if (season.first_aired) {
+      parts.push(`From ${season.first_aired}`)
+    }
+
+    return parts.length > 0 ? parts.join(' · ') : null
+  }
+
+  toggleAllSeasons(checked) {
+    const checkboxes = this.seasonsContainerTarget.querySelectorAll('.season-checkbox')
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = checked
+    })
+  }
+
+  startImport() {
+    // Collect selected seasons
+    const checkboxes = this.seasonsContainerTarget.querySelectorAll('input[type="checkbox"]:checked')
+    this.selectedSeasons = Array.from(checkboxes).map(cb => parseInt(cb.value))
+
+    if (this.selectedSeasons.length === 0) {
+      alert("Please select at least one season to import")
+      return
+    }
+
+    this.seasonsStatusTarget.textContent = `Importing ${this.selectedSeasons.length} season${this.selectedSeasons.length !== 1 ? 's' : ''}`
+    this.continueButtonTarget.disabled = true
+    this.episodesStatusTarget.textContent = "Starting import…"
+
+    this.fetchNextBatch()
   }
 
   async fetchNextBatch() {
@@ -113,7 +251,8 @@ export default class extends Controller {
           page,
           show_name: this.showNameValue,
           show_description: this.showDescriptionValue,
-          query: this.queryValue
+          query: this.queryValue,
+          selected_seasons: this.selectedSeasons
         })
       })
 

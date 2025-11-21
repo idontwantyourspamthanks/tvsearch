@@ -22,6 +22,67 @@ module Tvdb
       response["data"] || {}
     end
 
+    def series_seasons(series_id)
+      response = get("/series/#{series_id}/extended")
+      seasons_data = response.dig("data", "seasons") || []
+
+      # Filter to only aired order seasons and exclude "all seasons" type
+      seasons_data.select { |s| s.dig("type", "name")&.downcase&.include?("aired") }
+                  .reject { |s| s.dig("type", "name") == "All Seasons" }
+                  .map do |season|
+        # Get detailed season information
+        season_details = season_extended(season["id"]) if season["id"]
+
+        # Extract name - try nameTranslations array lookup, then fallback
+        season_name = extract_translation(season_details, "name") ||
+                     extract_translation(season, "name") ||
+                     "Season #{season['number']}"
+
+        # Remove the type suffix if it's just duplicating info
+        type_name = season.dig("type", "name")
+        season_name = season_name.gsub(/\s*\(#{Regexp.escape(type_name)}\)\s*$/i, "") if type_name
+
+        # Try to extract episode count from the episodes array if present
+        episodes = season_details&.dig("episodes") || []
+        episode_count = episodes.size if episodes.any?
+
+        # Try to extract air date range from episodes
+        aired_dates = episodes.map { |ep| ep["aired"] }.compact.map { |d| Date.parse(d) rescue nil }.compact.sort
+        first_aired = aired_dates.first&.strftime("%B %Y")
+        last_aired = aired_dates.last&.strftime("%B %Y")
+
+        {
+          id: season["id"],
+          number: season["number"],
+          name: season_name,
+          type: type_name,
+          year: season_details&.dig("year"),
+          first_aired: first_aired,
+          last_aired: last_aired,
+          episode_count: episode_count
+        }
+      end.sort_by { |s| s[:number].to_i }
+    rescue Error => e
+      Rails.logger.error "Error fetching seasons for series #{series_id}: #{e.message}"
+      []
+    end
+
+    def season_extended(season_id)
+      response = get("/seasons/#{season_id}/extended")
+      data = response["data"]
+
+      # Log what fields are actually available
+      if data
+        Rails.logger.debug "Season #{season_id} extended keys: #{data.keys.join(', ')}"
+        Rails.logger.debug "Season #{season_id} extended sample: #{data.slice('id', 'number', 'name', 'year', 'episodes').inspect}"
+      end
+
+      data
+    rescue Error => e
+      Rails.logger.warn "Could not fetch extended info for season #{season_id}: #{e.message}"
+      nil
+    end
+
     def episodes_for_series(series_id)
       page = 0
       episodes = []
@@ -54,6 +115,22 @@ module Tvdb
     private
 
     attr_reader :api_key
+
+    def extract_translation(data, field)
+      return nil unless data.is_a?(Hash)
+
+      # Try direct field access first
+      direct_value = data[field]
+      return direct_value if direct_value.present?
+
+      # Try translations - nameTranslations or overviewTranslations
+      translations_key = "#{field}Translations"
+      translations = data[translations_key]
+      return nil unless translations.is_a?(Hash)
+
+      # Try English first, then any available language
+      translations["eng"] || translations["en"] || translations.values.first
+    end
 
     def token
       Rails.cache.fetch("tvdb_token", expires_in: 20.minutes) do

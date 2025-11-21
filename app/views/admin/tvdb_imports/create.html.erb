@@ -34,13 +34,32 @@
     <div class="import-card">
       <div class="card-header">
         <p class="eyebrow">Step 2</p>
+        <h2>Select seasons to import</h2>
+      </div>
+      <div class="card-body">
+        <p data-tvdb-import-target="seasonsStatus">Waiting for metadata…</p>
+        <div data-tvdb-import-target="seasonsContainer" style="margin: 1rem 0;"></div>
+        <button
+          data-tvdb-import-target="continueButton"
+          data-action="click->tvdb-import#startImport"
+          class="button"
+          style="display: none;"
+        >
+          Continue with selected seasons
+        </button>
+      </div>
+    </div>
+
+    <div class="import-card">
+      <div class="card-header">
+        <p class="eyebrow">Step 3</p>
         <h2>Fetch and import episodes</h2>
       </div>
       <div class="card-body">
         <div class="progress">
           <div class="progress-bar" data-tvdb-import-target="progressBar"></div>
         </div>
-        <p data-tvdb-import-target="episodesStatus">Waiting for metadata…</p>
+        <p data-tvdb-import-target="episodesStatus">Waiting for season selection…</p>
         <p class="muted small" data-tvdb-import-target="episodesCounts"></p>
         <div class="log" data-tvdb-import-target="log">
           <p class="muted small">No batches yet.</p>
@@ -50,7 +69,7 @@
 
     <div class="import-card">
       <div class="card-header">
-        <p class="eyebrow">Step 3</p>
+        <p class="eyebrow">Step 4</p>
         <h2>Summary</h2>
       </div>
       <div class="card-body">
