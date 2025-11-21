@@ -17,5 +17,6 @@ Rails.application.routes.draw do
     post "tvdb_import", to: "tvdb_imports#create"
     post "tvdb_import/details", to: "tvdb_imports#details", as: :tvdb_import_details
     post "tvdb_import/batch", to: "tvdb_imports#batch", as: :tvdb_import_batch
+    get "database/download", to: "database#download", as: :database_download
   end
 end
