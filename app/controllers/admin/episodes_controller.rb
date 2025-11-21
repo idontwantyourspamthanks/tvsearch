@@ -5,7 +5,7 @@ class Admin::EpisodesController < ApplicationController
   def index
     @query = params[:q].to_s.strip
     @show_id = params[:show_id].presence
-    scope = Episode.search(@query).recent_first
+    scope = Episode.search(@query).by_show_episode
     scope = scope.where(show_id: @show_id) if @show_id
     @episodes, @episodes_total, @current_page, @total_pages = paginate(scope)
     @shows = Show.order(:name)
