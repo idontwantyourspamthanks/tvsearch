@@ -52,8 +52,14 @@
     </div>
 
     <div class="pagination">
-      <span>Page <%= @current_page %> of <%= @total_pages %></span>
+      <span>Page <%= @current_page %> of <%= @total_pages %> · <%= pluralize(@episodes_total, "episode") %></span>
       <div class="pagination-links">
+        <%= form_with url: admin_episodes_path, method: :get, local: true, class: "pagination-form" do |form| %>
+          <%= form.hidden_field :q, value: @query if @query.present? %>
+          <%= form.hidden_field :show_id, value: @show_id if @show_id.present? %>
+          <%= form.select :page, options_for_select((1..@total_pages).map { |page| ["Page #{page}", page] }, @current_page), {}, class: "select" %>
+          <%= form.submit "Go" %>
+        <% end %>
         <% if @current_page > 1 %>
           <%= link_to "Previous", admin_episodes_path(q: @query, show_id: @show_id, page: @current_page - 1) %>
         <% end %>
