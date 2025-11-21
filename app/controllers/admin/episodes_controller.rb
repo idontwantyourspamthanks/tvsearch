@@ -18,7 +18,7 @@ class Admin::EpisodesController < ApplicationController
   def create
     @episode = Episode.new(episode_params)
     if @episode.save
-      redirect_to admin_episodes_path, notice: "Episode created."
+      redirect_to episodes_list_path, notice: "Episode created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -29,7 +29,7 @@ class Admin::EpisodesController < ApplicationController
 
   def update
     if @episode.update(episode_params)
-      redirect_to admin_episodes_path, notice: "Episode updated."
+      redirect_to episodes_list_path, notice: "Episode updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -37,7 +37,7 @@ class Admin::EpisodesController < ApplicationController
 
   def destroy
     @episode.destroy
-    redirect_to admin_episodes_path, notice: "Episode removed."
+    redirect_to episodes_list_path, notice: "Episode removed."
   end
 
   private
@@ -58,5 +58,9 @@ class Admin::EpisodesController < ApplicationController
     total_pages = (total.to_f / per_page).ceil
     records = scope.limit(per_page).offset((page - 1) * per_page)
     [ records, total, page, total_pages.positive? ? total_pages : 1 ]
+  end
+
+  def episodes_list_path
+    params[:return_to].presence || admin_episodes_path(q: params[:q], show_id: params[:show_id], page: params[:page])
   end
 end

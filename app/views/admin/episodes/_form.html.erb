@@ -1,4 +1,5 @@
 <%= form_with model: [:admin, @episode], class: "stack" do |form| %>
+  <%= hidden_field_tag :return_to, params[:return_to].presence || admin_episodes_path(q: params[:q], show_id: params[:show_id], page: params[:page]) %>
   <% if @episode.errors.any? %>
     <div class="alert">
       <strong><%= pluralize(@episode.errors.count, "error") %> prevented saving:</strong>

@@ -41,7 +41,7 @@
           </div>
           <div class="muted"><%= episode.aired_on&.to_fs(:long) || "–" %></div>
           <div class="table-actions">
-            <%= link_to "Edit", edit_admin_episode_path(episode) %>
+            <%= link_to "Edit", edit_admin_episode_path(episode, q: @query, show_id: @show_id, page: @current_page) %>
             <%= button_to "Delete", admin_episode_path(episode), method: :delete, data: { turbo_confirm: "Delete this episode?" }, class: "link-button" %>
           </div>
         </div>
