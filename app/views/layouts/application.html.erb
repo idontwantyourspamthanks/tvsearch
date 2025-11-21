@@ -33,6 +33,7 @@
           <%= link_to "Episodes", admin_root_path %>
           <%= link_to "Shows", admin_shows_path %>
           <%= link_to "Import from TVDB", admin_tvdb_import_path %>
+          <%= link_to "Change password", edit_admin_password_path %>
           <%= button_to "Sign out", admin_logout_path, method: :delete, class: "link-button" %>
         <% else %>
           <%= link_to "Admin login", admin_login_path %>

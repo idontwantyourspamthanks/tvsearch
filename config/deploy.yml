@@ -29,7 +29,8 @@ registry:
   server: docker.io
 
   # Needed for authenticated registries.
-  username: ryanwilliamsdocker
+  username: ryanwilliamsdocker!
+
 
   # Always use an access token rather than real password when possible.
   password:

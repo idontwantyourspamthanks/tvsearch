@@ -1,0 +1,32 @@
+<% content_for :title, "Change password" %>
+
+<div class="page small">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Change password</h1>
+    </div>
+  </div>
+
+  <%= form_with url: admin_password_path, method: :patch, class: "stack" do |form| %>
+    <div class="field">
+      <%= form.label :current_password, "Current password" %>
+      <%= form.password_field :current_password, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password, "New password" %>
+      <%= form.password_field :password, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password_confirmation, "Confirm new password" %>
+      <%= form.password_field :password_confirmation, required: true %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit "Update password", class: "button" %>
+      <%= link_to "Cancel", admin_root_path, class: "link" %>
+    </div>
+  <% end %>
+</div>
