@@ -38,4 +38,11 @@ class Episode < ApplicationRecord
     @alternate_titles_text = value
     self.alternate_titles = value.to_s.split(",").map { |val| val.strip.presence }.compact
   end
+
+  def display_image_url
+    # Prefer local cached image, fall back to remote URL
+    return "/#{image_path}" if image_path.present?
+
+    image_url
+  end
 end

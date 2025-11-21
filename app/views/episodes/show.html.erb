@@ -17,9 +17,9 @@
       <% end %>
     </p>
 
-    <% if @episode.image_url %>
+    <% if @episode.display_image_url %>
       <div class="episode-image">
-        <%= image_tag @episode.image_url, alt: @episode.title, loading: "lazy" %>
+        <%= image_tag @episode.display_image_url, alt: @episode.title, loading: "lazy" %>
       </div>
     <% end %>
 

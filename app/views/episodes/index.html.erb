@@ -23,9 +23,9 @@
         <% @episodes.each do |episode| %>
           <li class="episode-card">
             <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
-              <% if episode.image_url %>
+              <% if episode.display_image_url %>
                 <div class="episode-thumbnail">
-                  <%= image_tag episode.image_url, alt: episode.title, loading: "lazy" %>
+                  <%= image_tag episode.display_image_url, alt: episode.title, loading: "lazy" %>
                 </div>
               <% end %>
               <div class="episode-meta">
