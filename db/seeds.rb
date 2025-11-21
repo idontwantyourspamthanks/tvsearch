@@ -22,7 +22,7 @@ episodes = [
     season_number: 4,
     episode_number: 13,
     description: "Michael and Jan host an incredibly awkward dinner that unravels in front of the Scranton crew.",
-    alternate_titles: ["Jan's candle night"],
+    alternate_titles: [ "Jan's candle night" ],
     aired_on: Date.new(2008, 4, 10)
   },
   {

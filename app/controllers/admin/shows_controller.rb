@@ -64,6 +64,6 @@ class Admin::ShowsController < ApplicationController
     total = scope.count
     total_pages = (total.to_f / per_page).ceil
     records = scope.limit(per_page).offset((page - 1) * per_page)
-    [records, total, page, total_pages.positive? ? total_pages : 1]
+    [ records, total, page, total_pages.positive? ? total_pages : 1 ]
   end
 end
