@@ -14,7 +14,7 @@
 
   <%= form_with url: admin_episodes_path, method: :get, class: "search-form" do |form| %>
     <div class="search-box">
-      <%= form.search_field :q, value: @query, placeholder: "Filter by title, description, or show..." %>
+      <%= form.search_field :q, value: @query, placeholder: "Filter by title, nickname, description, or show..." %>
       <%= form.collection_select :show_id, @shows, :id, :name, { include_blank: "All shows" }, { class: "select" } %>
       <%= form.submit "Search" %>
     </div>
@@ -33,6 +33,9 @@
           <div><strong><%= episode.show&.name %></strong></div>
           <div>
             <div><%= episode.title %></div>
+            <% if episode.alternate_titles.present? %>
+              <div class="muted small">Also called: <%= episode.alternate_titles.join(", ") %></div>
+            <% end %>
             <div class="muted">
               <% if episode.season_number && episode.episode_number %>
                 S<%= episode.season_number %> · E<%= episode.episode_number %>
