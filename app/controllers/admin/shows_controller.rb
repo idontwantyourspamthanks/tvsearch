@@ -3,7 +3,10 @@ class Admin::ShowsController < ApplicationController
   before_action :set_show, only: %i[edit update destroy]
 
   def index
-    @shows = Show.order(:name)
+    @query = params[:q].to_s.strip
+    scope = Show.order(:name)
+    scope = scope.where("LOWER(name) LIKE ?", "%#{@query.downcase}%") if @query.present?
+    @shows, @shows_total, @current_page, @total_pages = paginate(scope)
   end
 
   def new
@@ -52,5 +55,15 @@ class Admin::ShowsController < ApplicationController
 
   def show_params
     params.require(:show).permit(:name, :description)
+  end
+
+  def paginate(scope)
+    page = params.fetch(:page, 1).to_i
+    page = 1 if page < 1
+    per_page = 20
+    total = scope.count
+    total_pages = (total.to_f / per_page).ceil
+    records = scope.limit(per_page).offset((page - 1) * per_page)
+    [records, total, page, total_pages.positive? ? total_pages : 1]
   end
 end

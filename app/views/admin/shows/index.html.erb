@@ -12,6 +12,13 @@
     </div>
   </div>
 
+  <%= form_with url: admin_shows_path, method: :get, class: "search-form" do |form| %>
+    <div class="search-box">
+      <%= form.search_field :q, value: @query, placeholder: "Filter by show name..." %>
+      <%= form.submit "Search" %>
+    </div>
+  <% end %>
+
   <% if @shows.any? %>
     <div class="table">
       <div class="table-row table-head">
@@ -29,6 +36,18 @@
           </div>
         </div>
       <% end %>
+    </div>
+
+    <div class="pagination">
+      <span>Page <%= @current_page %> of <%= @total_pages %></span>
+      <div class="pagination-links">
+        <% if @current_page > 1 %>
+          <%= link_to "Previous", admin_shows_path(q: @query, page: @current_page - 1) %>
+        <% end %>
+        <% if @current_page < @total_pages %>
+          <%= link_to "Next", admin_shows_path(q: @query, page: @current_page + 1) %>
+        <% end %>
+      </div>
     </div>
   <% else %>
     <div class="empty-state">

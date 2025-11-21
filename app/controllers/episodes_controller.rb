@@ -1,7 +1,11 @@
 class EpisodesController < ApplicationController
   def index
     @query = params[:q].to_s.strip
-    @episodes = Episode.search(@query).recent_first
+    @show_id = params[:show_id].presence
+    scope = Episode.search(@query).recent_first
+    scope = scope.where(show_id: @show_id) if @show_id
+    @episodes = scope
+    @shows = Show.order(:name)
   end
 
   def show

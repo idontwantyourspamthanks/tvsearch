@@ -135,6 +135,14 @@ h1 {
   font-size: 16px;
 }
 
+.search-box .select {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+
 .search-box input[type="search"]:focus {
   outline: 2px solid var(--accent);
   border-color: var(--accent);
@@ -310,6 +318,18 @@ h1 {
 .flash.alert {
   background: rgba(248, 113, 113, 0.14);
   border-color: rgba(248, 113, 113, 0.45);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.pagination a {
+  margin-left: 12px;
 }
 
 .modal {
