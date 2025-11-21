@@ -29,7 +29,8 @@
 !/tmp/storage/.keep
 
 /public/assets
-/public/episode_images
+/public/episode_images/*
+!/public/episode_images/.keep
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
