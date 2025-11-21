@@ -205,6 +205,10 @@ h1 {
   line-height: 1.5;
 }
 
+.small {
+  font-size: 14px;
+}
+
 .empty-state {
   text-align: center;
   color: var(--muted);

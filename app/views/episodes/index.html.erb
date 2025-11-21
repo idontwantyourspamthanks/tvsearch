@@ -26,6 +26,9 @@
               <div class="episode-meta">
                 <span class="eyebrow"><%= episode.show&.name %></span>
                 <strong><%= episode.title %></strong>
+                <% if episode.alternate_titles.present? %>
+                  <p class="muted small">Also called: <%= episode.alternate_titles.join(", ") %></p>
+                <% end %>
                 <p class="muted">
                   <% if episode.season_number && episode.episode_number %>
                     S<%= episode.season_number %> · E<%= episode.episode_number %>
