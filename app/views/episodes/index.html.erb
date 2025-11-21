@@ -6,7 +6,7 @@
     <h1>Search a curated set of episodes</h1>
     <p class="lede">Type a show name, episode title, or a plot detail to look up the episodes we currently track.</p>
 
-    <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results" }, class: "search-form" do |form| %>
+    <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results", controller: "live-search", action: "input->live-search#queue change->live-search#queue", "live-search-delay-value": 400 }, class: "search-form" do |form| %>
       <div class="search-box">
         <%= form.label :q, "Search", class: "sr-only" %>
         <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true %>
