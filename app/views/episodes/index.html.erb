@@ -23,6 +23,11 @@
         <% @episodes.each do |episode| %>
           <li class="episode-card">
             <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
+              <% if episode.image_url %>
+                <div class="episode-thumbnail">
+                  <%= image_tag episode.image_url, alt: episode.title, loading: "lazy" %>
+                </div>
+              <% end %>
               <div class="episode-meta">
                 <span class="eyebrow"><%= episode.show&.name %></span>
                 <strong><%= highlight_query(episode.title, @query) %></strong>
