@@ -9,6 +9,14 @@ class Episode < ApplicationRecord
   validates :season_number, :episode_number, numericality: { allow_nil: true, greater_than: 0 }
 
   scope :recent_first, -> { order(aired_on: :desc, season_number: :desc, episode_number: :desc) }
+  scope :by_show_episode, lambda {
+    left_joins(:show).order(
+      Arel.sql("LOWER(shows.name) ASC"),
+      :season_number,
+      :episode_number,
+      :aired_on
+    )
+  }
 
   def self.search(query)
     scope = left_joins(:show).includes(:show)
