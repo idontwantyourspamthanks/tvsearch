@@ -11,7 +11,6 @@
         <%= form.label :q, "Search", class: "sr-only" %>
         <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true %>
         <%= form.collection_select :show_id, @shows, :id, :name, { include_blank: "All shows" }, { class: "select" } %>
-        <%= form.submit "Search" %>
       </div>
       <p class="hint">Filter by title, description, nickname, or show.</p>
     <% end %>
