@@ -20,13 +20,21 @@
     <% if @episodes.any? %>
       <ul class="episode-list">
         <% @episodes.each do |episode| %>
-          <li class="episode-card">
+          <% admin_data = {} %>
+          <% if current_admin_user %>
+            <% admin_data[:controller] = "episode-image" %>
+            <% admin_data[:"episode-image-refresh-url-value"] = refresh_image_episode_path(episode) %>
+            <% admin_data[:"episode-image-title-value"] = episode.title %>
+          <% end %>
+          <li class="episode-card"<%= tag.attributes(data: admin_data) if admin_data.any? %>>
             <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
-              <% if episode.display_image_url %>
-                <div class="episode-thumbnail">
-                  <%= image_tag episode.display_image_url, alt: episode.title, loading: "lazy" %>
-                </div>
-              <% end %>
+              <div class="episode-thumbnail" data-episode-image-target="thumbnail">
+                <% if episode.display_image_url.present? %>
+                  <%= image_tag episode.display_image_url, alt: episode.title, loading: "lazy", data: { "episode-image-target": "image" } %>
+                <% elsif current_admin_user %>
+                  <div class="muted small">No image cached</div>
+                <% end %>
+              </div>
               <div class="episode-meta">
                 <span class="eyebrow"><%= episode.show&.name %></span>
                 <strong><%= highlight_query(episode.title, @query) %></strong>
@@ -48,6 +56,14 @@
               <% if episode.description.present? %>
                 <p class="description"><%= highlight_query(truncate(episode.description, length: 160), @query) %></p>
               <% end %>
+            <% end %>
+            <% if current_admin_user %>
+              <div class="admin-image-actions" data-episode-image-target="adminActions">
+                <p class="muted small" data-episode-image-target="status"><%= episode.display_image_url.present? ? "" : "No image cached" %></p>
+                <button type="button" class="button small" data-action="episode-image#refresh" data-episode-image-target="button">
+                  Refetch image
+                </button>
+              </div>
             <% end %>
           </li>
         <% end %>

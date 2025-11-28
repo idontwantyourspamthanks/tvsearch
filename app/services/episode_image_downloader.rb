@@ -6,22 +6,23 @@ require "securerandom"
 class EpisodeImageDownloader
   CACHE_DIR = Rails.root.join("public", "episode_images")
 
-  def self.download(episode)
-    new(episode).download
+  def self.download(episode, force: false)
+    new(episode, force:).download
   end
 
   def self.cached_image_present?(episode)
     new(episode).send(:cached_image_present?)
   end
 
-  def initialize(episode)
+  def initialize(episode, force: false)
     @episode = episode
+    @force = force
   end
 
   def download
     return false unless @episode.image_url.present?
 
-    if cached_image_present?
+    if !@force && cached_image_present?
       Rails.logger.info "Image already cached for episode #{@episode.id} (#{cached_image_path})"
       return true
     elsif @episode.image_path.present?
