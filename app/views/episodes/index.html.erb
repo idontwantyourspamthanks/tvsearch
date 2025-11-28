@@ -60,6 +60,7 @@
             <% if current_admin_user %>
               <div class="admin-image-actions" data-episode-image-target="adminActions">
                 <p class="muted small" data-episode-image-target="status"><%= episode.display_image_url.present? ? "" : "No image cached" %></p>
+                <%= link_to "Edit", edit_admin_episode_path(episode, return_to: request.fullpath), class: "button small" %>
                 <button type="button" class="button small" data-action="episode-image#refresh" data-episode-image-target="button">
                   Refetch image
                 </button>
