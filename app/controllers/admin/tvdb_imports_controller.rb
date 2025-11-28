@@ -102,41 +102,28 @@ class Admin::TvdbImportsController < ApplicationController
       end
 
       episode = find_matching_episode(show, attrs)
+      image_missing_before = image_missing_on_disk?(episode)
       apply_episode_attributes(episode, attrs)
 
-      if episode.new_record?
-        if episode.save
-          status = :created
-          reason = nil
-        else
-          status = :skipped
-          reason = episode.errors.full_messages.join(", ")
-        end
-      elsif episode.changed?
-        if episode.save
-          status = :updated
-          reason = "Updated: #{episode.previous_changes.keys.join(', ')}"
-        else
-          status = :skipped
-          reason = episode.errors.full_messages.join(", ")
-        end
-      else
-        status = :unchanged
-        reason = "Already up to date"
+      persistence = persist_episode(episode)
+      image_result = ensure_episode_image(episode, image_missing_before)
+
+      status = persistence[:status]
+      if image_result[:action] == :downloaded && status == :unchanged
+        status = :updated
+      elsif image_result[:action] == :failed && status == :unchanged
+        status = :skipped
       end
 
-      # Always try to download image if we have a URL but no cached file
-      if episode.persisted? && episode.image_url.present? && episode.image_path.blank?
-        download_success = EpisodeImageDownloader.download(episode)
-        Rails.logger.info "Image download for episode #{episode.id}: #{download_success ? 'SUCCESS' : 'FAILED'}"
-      end
+      reason_parts = [persistence[:reason], image_result[:reason]].compact
+      reason = reason_parts.present? ? reason_parts.join(" · ") : default_reason_for(status)
 
-      { episode:, status:, reason: }
+      { episode:, status:, reason:, image_action: image_result[:action] }
     end.compact
   end
 
   def format_entries(results)
-    results.first(8).map do |entry|
+    results.map do |entry|
       episode = entry[:episode]
 
       if episode
@@ -146,7 +133,8 @@ class Admin::TvdbImportsController < ApplicationController
           episode_number: episode.episode_number,
           aired_on: episode.aired_on&.to_fs(:long),
           status: entry[:status],
-          reason: entry[:reason]
+          reason: entry[:reason],
+          image_action: entry[:image_action]
         }
       else
         # Episode was skipped before creation (e.g., missing title)
@@ -156,7 +144,8 @@ class Admin::TvdbImportsController < ApplicationController
           episode_number: entry.dig(:data, :episode),
           aired_on: nil,
           status: entry[:status],
-          reason: entry[:reason]
+          reason: entry[:reason],
+          image_action: entry[:image_action]
         }
       end
     end
@@ -241,5 +230,64 @@ class Admin::TvdbImportsController < ApplicationController
     end
 
     episode.assign_attributes(safe_attrs)
+  end
+
+  def persist_episode(episode)
+    if episode.new_record?
+      if episode.save
+        changed_fields = interesting_changes(episode.previous_changes.keys)
+        reason = changed_fields.any? ? "Created with #{changed_fields.join(', ')}" : "Created"
+        { status: :created, reason:, changed_fields: }
+      else
+        { status: :skipped, reason: episode.errors.full_messages.join(", "), changed_fields: [] }
+      end
+    elsif episode.changed?
+      if episode.save
+        changed_fields = interesting_changes(episode.previous_changes.keys)
+        reason = changed_fields.any? ? "Updated: #{changed_fields.join(', ')}" : "Updated"
+        { status: :updated, reason:, changed_fields: }
+      else
+        { status: :skipped, reason: episode.errors.full_messages.join(", "), changed_fields: [] }
+      end
+    else
+      { status: :unchanged, reason: "No attribute changes", changed_fields: [] }
+    end
+  end
+
+  def interesting_changes(keys)
+    ignored = %w[id show_id created_at updated_at image_updated_at]
+    keys.map(&:to_s).uniq - ignored
+  end
+
+  def image_missing_on_disk?(episode)
+    return true if episode.image_path.blank?
+
+    !EpisodeImageDownloader.cached_image_present?(episode)
+  end
+
+  def ensure_episode_image(episode, was_missing)
+    return { action: :none } unless episode.persisted? && episode.image_url.present?
+
+    cached = EpisodeImageDownloader.cached_image_present?(episode)
+    return { action: :cached, reason: "Image already cached" } if cached && !was_missing
+
+    download_success = EpisodeImageDownloader.download(episode)
+    cached_after_download = EpisodeImageDownloader.cached_image_present?(episode)
+
+    if download_success && cached_after_download
+      reason = was_missing ? "Refreshed missing image" : "Cached episode image"
+      { action: :downloaded, reason: }
+    else
+      { action: :failed, reason: "Image download failed" }
+    end
+  end
+
+  def default_reason_for(status)
+    case status
+    when :created then "Created"
+    when :updated then "Updated"
+    when :skipped then "Skipped"
+    else "Already up to date"
+    end
   end
 end

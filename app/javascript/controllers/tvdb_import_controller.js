@@ -13,6 +13,8 @@ export default class extends Controller {
     "log",
     "summaryStatus",
     "summaryCounts",
+    "fullListStatus",
+    "fullLog",
     "errorBox",
     "errorMessage"
   ]
@@ -38,6 +40,7 @@ export default class extends Controller {
     this.allResults = []  // Store all episode results for final summary
     this.seasons = []  // Store available seasons
     this.selectedSeasons = []  // Store selected season numbers
+    this.fullLogInitialized = false
     this.fetchMetadata()
   }
 
@@ -213,6 +216,7 @@ export default class extends Controller {
     this.seasonsStatusTarget.textContent = `Importing ${this.selectedSeasons.length} season${this.selectedSeasons.length !== 1 ? 's' : ''}`
     this.continueButtonTarget.disabled = true
     this.episodesStatusTarget.textContent = "Starting import…"
+    this.fullListStatusTarget.textContent = "Importing episodes…"
 
     this.fetchNextBatch()
   }
@@ -291,6 +295,7 @@ export default class extends Controller {
     // Store all entries for final summary
     if (data.entries && data.entries.length > 0) {
       this.allResults.push(...data.entries)
+      this.renderFullResults(data.entries)
     }
 
     this.updateProgress(data)
@@ -330,6 +335,59 @@ export default class extends Controller {
 
     const rows = Array.from(this.logTarget.querySelectorAll(".entry"))
     rows.slice(24).forEach((row) => row.remove())
+  }
+
+  renderFullResults(entries) {
+    if (!entries.length) return
+
+    if (!this.fullLogInitialized) {
+      this.fullLogTarget.innerHTML = ""
+      this.fullLogInitialized = true
+    }
+
+    const fragment = document.createDocumentFragment()
+    entries.forEach((entry) => fragment.appendChild(this.buildFullRow(entry)))
+    this.fullLogTarget.appendChild(fragment)
+
+    const total = this.allResults.length
+    this.fullListStatusTarget.textContent = `Tracking ${total} episode${total === 1 ? '' : 's'} from this import`
+  }
+
+  buildFullRow(entry) {
+    const row = document.createElement("div")
+    row.className = "full-entry"
+
+    const header = document.createElement("div")
+    header.className = "full-entry-header"
+
+    const text = document.createElement("div")
+    const title = document.createElement("strong")
+    title.textContent = entry.title
+    text.appendChild(title)
+
+    const meta = document.createElement("div")
+    meta.className = "muted small"
+    meta.textContent = this.formatMeta(entry)
+    text.appendChild(meta)
+
+    header.appendChild(text)
+
+    const badge = document.createElement("span")
+    badge.className = `pill ${this.badgeClass(entry.status)}`
+    badge.textContent = this.labelFor(entry.status)
+    header.appendChild(badge)
+
+    row.appendChild(header)
+
+    if (entry.reason) {
+      const reason = document.createElement("div")
+      reason.className = "muted small"
+      reason.style.fontStyle = "italic"
+      reason.textContent = entry.reason
+      row.appendChild(reason)
+    }
+
+    return row
   }
 
   buildLogRow(entry) {
@@ -405,6 +463,11 @@ export default class extends Controller {
 
     // Show breakdown by status
     this.showDetailedBreakdown()
+
+    const total = this.allResults.length
+    if (total > 0) {
+      this.fullListStatusTarget.textContent = `Processed ${total} episode${total === 1 ? '' : 's'}`
+    }
   }
 
   showDetailedBreakdown() {
@@ -412,6 +475,8 @@ export default class extends Controller {
     const unchanged = this.allResults.filter(e => e.status === 'unchanged')
     const updated = this.allResults.filter(e => e.status === 'updated')
     const created = this.allResults.filter(e => e.status === 'created')
+    const imagesRefreshed = this.allResults.filter(e => e.image_action === 'downloaded').length
+    const imageFailures = this.allResults.filter(e => e.image_action === 'failed').length
 
     const breakdownLines = []
 
@@ -437,6 +502,14 @@ export default class extends Controller {
       Object.entries(reasons).forEach(([reason, count]) => {
         breakdownLines.push(`  - ${count}x ${reason}`)
       })
+    }
+
+    if (imagesRefreshed > 0) {
+      breakdownLines.push(`\n🖼 Refreshed images for ${imagesRefreshed} episodes`)
+    }
+
+    if (imageFailures > 0) {
+      breakdownLines.push(`\n⚠ Image downloads failed for ${imageFailures} episodes`)
     }
 
     if (breakdownLines.length > 0) {

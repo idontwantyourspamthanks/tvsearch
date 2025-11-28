@@ -1,5 +1,7 @@
 require "net/http"
 require "fileutils"
+require "pathname"
+require "securerandom"
 
 class EpisodeImageDownloader
   CACHE_DIR = Rails.root.join("public", "episode_images")
@@ -8,13 +10,23 @@ class EpisodeImageDownloader
     new(episode).download
   end
 
+  def self.cached_image_present?(episode)
+    new(episode).send(:cached_image_present?)
+  end
+
   def initialize(episode)
     @episode = episode
   end
 
   def download
     return false unless @episode.image_url.present?
-    return true if @episode.image_path.present? # Already cached
+
+    if cached_image_present?
+      Rails.logger.info "Image already cached for episode #{@episode.id} (#{cached_image_path})"
+      return true
+    elsif @episode.image_path.present?
+      Rails.logger.warn "Cached image missing or empty for episode #{@episode.id} (expected at #{cached_image_path}) - attempting re-download"
+    end
 
     Rails.logger.info "Attempting to download image for episode #{@episode.id} (#{@episode.title})"
     Rails.logger.info "  Image URL: #{@episode.image_url}"
@@ -38,7 +50,8 @@ class EpisodeImageDownloader
 
     # Determine file extension from URL or content type
     extension = determine_extension(uri, response)
-    filename = "#{@episode.tvdb_id}#{extension}"
+    filename_root = @episode.tvdb_id.presence || @episode.id || SecureRandom.hex(6)
+    filename = "#{filename_root}#{extension}"
     file_path = CACHE_DIR.join(filename)
 
     Rails.logger.info "  Saving to: #{file_path}"
@@ -61,6 +74,21 @@ class EpisodeImageDownloader
   end
 
   private
+
+  def cached_image_present?
+    path = cached_image_path
+    return false unless path
+
+    File.file?(path) && File.size(path).positive?
+  end
+
+  def cached_image_path
+    return unless @episode.image_path.present?
+
+    relative_path = @episode.image_path.to_s.delete_prefix("/")
+    full_path = Rails.root.join("public", relative_path)
+    Pathname.new(full_path)
+  end
 
   def determine_extension(uri, response)
     # Try to get extension from URL

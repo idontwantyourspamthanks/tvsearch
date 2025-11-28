@@ -449,6 +449,10 @@ h1 {
   margin: 4px 0;
 }
 
+.import-card.full-width {
+  grid-column: 1 / -1;
+}
+
 .progress {
   background: var(--muted-2);
   border-radius: 8px;
@@ -490,6 +494,38 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.full-log {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.full-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.full-entry:last-child {
+  border-bottom: none;
+}
+
+.full-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.full-entry .pill {
+  margin-left: auto;
 }
 
 .pill {

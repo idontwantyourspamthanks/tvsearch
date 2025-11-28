@@ -39,12 +39,13 @@ This documents how we fetch and import data from TVDB so future changes are easi
      - Episodes are filtered to only include selected season numbers.
      - Show lookup prefers `tvdb_id`, then name. Episodes match by `tvdb_id`, then season/episode, then downcased title.
      - For existing episodes we only fill blank fields (including `tvdb_id`) to avoid overwriting edits; show description set only if blank.
-     - Tracks reason for each status: created (no reason), updated (lists changed fields), unchanged ("Already up to date"), skipped (validation errors or missing title).
-     - Response JSON includes per-page stats: `{ page, fetched, next_page, total_pages, created, updated, unchanged, skipped, entries[...] }`.
+     - Image handling: cache dir is `public/episode_images`. We now verify that any cached image actually exists and is non-empty before early return; if the file is missing/zero bytes we re-download. Episodes with a valid `image_url` but missing/bad cache are marked as updated once the image is refreshed.
+     - Tracks reason for each status: created (lists interesting fields), updated (lists changed fields), unchanged ("No attribute changes"), skipped (validation errors or missing title) plus image download notes (cached/downloaded/failed) when relevant.
+     - Response JSON includes per-page stats: `{ page, fetched, next_page, total_pages, created, updated, unchanged, skipped, entries[...] }` where `entries` contains **all** processed episodes with `image_action` (`downloaded`, `cached`, `failed`, or `none`).
      - Pagination stops when `next_page` is null/undefined or equals current page (prevents infinite loops).
    - **Step 4: Summary** — After `next_page` is `null`, UI shows totals and detailed breakdown.
-     - Groups episodes by status and reason (e.g., "15x Updated: title, description").
-     - Displays last 24 entries in log with reasons shown in italics.
+     - Groups episodes by status and reason (e.g., "15x Updated: title, description") and now calls out image refresh counts.
+     - Displays last 24 entries in the Step 3 log with reasons shown in italics, and a full-width "Per-episode status" block listing **all** imported episodes and what happened to each (including image work).
      - Progress bar reflects page progress; counts show fetched totals and remaining pages.
 
 ### Pagination details
