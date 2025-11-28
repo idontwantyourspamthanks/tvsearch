@@ -77,3 +77,4 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - Admin controller: `app/controllers/admin/tvdb_imports_controller.rb`
 - Admin search/import page: `app/views/admin/tvdb_imports/new.html.erb`
 - Progress page + Stimulus: `app/views/admin/tvdb_imports/create.html.erb`, `app/javascript/controllers/tvdb_import_controller.js`
+- Deploy: `config/deploy.yml` mounts `tv_storage:/rails/storage` and `tv_episode_images:/rails/public/episode_images` so episode image cache persists across releases.
