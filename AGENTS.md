@@ -65,7 +65,7 @@ This documents how we fetch and import data from TVDB so future changes are easi
 
 ### Error handling
 - Any 4xx/5xx from TVDB raises `Tvdb::Client::Error` with TVDB's `status` message.
-- JSON parse errors raise `Unexpected response format`.
+- JSON parsing now retries after forcing UTF-8/replacing bad bytes and raises `Unexpected response format (url, status ...): ... — body: <snippet>` with a body preview for debugging.
 - `/details` and `/batch` return `{ error, error_class, detail }` (and page context for batch) with HTTP 502; UI surfaces the full message and stops.
 - Failed season extended fetches log warnings but don't stop the import (season shown without extended data).
 
