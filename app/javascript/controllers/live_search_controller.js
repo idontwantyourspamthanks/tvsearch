@@ -8,6 +8,14 @@ export default class extends Controller {
     this.clearTimer()
   }
 
+  connect() {
+    this.submittedOnConnect = false
+    if (this.shouldSubmitOnConnect()) {
+      this.element.requestSubmit()
+      this.submittedOnConnect = true
+    }
+  }
+
   queue() {
     this.clearTimer()
     this.timer = setTimeout(() => {
@@ -21,5 +29,17 @@ export default class extends Controller {
       clearTimeout(this.timer)
       this.timer = null
     }
+  }
+
+  shouldSubmitOnConnect() {
+    if (this.submittedOnConnect) return false
+
+    const queryField = this.element.querySelector('input[name="q"]')
+    const showSelect = this.element.querySelector('select[name="show_id"]')
+
+    const hasQuery = queryField && queryField.value.trim().length > 0
+    const hasShowFilter = showSelect && showSelect.value && showSelect.value.trim().length > 0
+
+    return hasQuery || hasShowFilter
   }
 }
