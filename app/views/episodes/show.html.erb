@@ -19,7 +19,7 @@
 
     <% if @episode.display_image_url %>
       <div class="episode-image">
-        <%= image_tag @episode.display_image_url, alt: @episode.title, loading: "lazy" %>
+        <%= image_tag @episode.display_image_url, alt: @episode.title, loading: "lazy", data: (current_admin_user ? {} : { controller: "image-bust", action: "error->image-bust#retry" }) %>
       </div>
     <% end %>
 

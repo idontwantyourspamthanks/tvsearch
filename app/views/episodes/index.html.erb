@@ -30,7 +30,7 @@
             <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
               <div class="episode-thumbnail" data-episode-image-target="thumbnail">
                 <% if episode.display_image_url.present? %>
-                  <%= image_tag episode.display_image_url, alt: episode.title, loading: "lazy", data: { "episode-image-target": "image" } %>
+                  <%= image_tag episode.display_image_url, alt: episode.title, loading: "lazy", data: { "episode-image-target": "image", controller: (current_admin_user ? nil : "image-bust"), action: (current_admin_user ? nil : "error->image-bust#retry") } %>
                 <% elsif current_admin_user %>
                   <div class="muted small">No image cached</div>
                 <% end %>
