@@ -68,6 +68,9 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - JSON parsing now retries after forcing UTF-8/replacing bad bytes and raises `Unexpected response format (url, status ...): ... — body: <snippet>` with a body preview for debugging.
 - `/details` and `/batch` return `{ error, error_class, detail }` (and page context for batch) with HTTP 502; UI surfaces the full message and stops.
 - Failed season extended fetches log warnings but don't stop the import (season shown without extended data).
+- Manual episode image refresh (admin-only button on homepage episode cards) posts to `/episodes/:id/refresh_image`; if `image_url` is blank but `tvdb_id` is present it fetches episode details from TVDB, populates `image_url`, and force-downloads the image.
+- `require_admin!` now returns JSON `{ error }` + 401 for JSON requests (e.g., the manual image refresh) instead of HTML redirects, to avoid JSON parse errors in fetch clients when sessions expire.
+- `refresh_image` returns early after rendering errors to avoid double-render exceptions.
 
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`

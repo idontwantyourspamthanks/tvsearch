@@ -13,6 +13,13 @@ class ApplicationController < ActionController::Base
   def require_admin!
     return if current_admin_user
 
-    redirect_to admin_login_path, alert: "Please log in to continue."
+    respond_to do |format|
+      format.json do
+        render json: { error: "Please log in to continue." }, status: :unauthorized
+      end
+      format.any do
+        redirect_to admin_login_path, alert: "Please log in to continue."
+      end
+    end
   end
 end

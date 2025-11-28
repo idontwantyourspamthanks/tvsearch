@@ -15,9 +15,7 @@ class EpisodesController < ApplicationController
   end
 
   def refresh_image
-    if @episode.image_url.blank?
-      return render json: { error: "Episode has no image URL to fetch." }, status: :unprocessable_entity
-    end
+    return unless ensure_image_url!
 
     success = EpisodeImageDownloader.download(@episode, force: true)
 
@@ -36,5 +34,31 @@ class EpisodesController < ApplicationController
 
   def set_episode
     @episode = Episode.find(params[:id])
+  end
+
+  def ensure_image_url!
+    return true if @episode.image_url.present?
+
+    if @episode.tvdb_id.present?
+      client = Tvdb::Client.new
+      data = client.episode_details(@episode.tvdb_id) || {}
+      image_url = extract_image_url(data["data"] || data)
+      if image_url.present?
+        @episode.update_columns(image_url: image_url, image_path: nil)
+        return true
+      end
+    end
+
+    render json: { error: "Episode has no image URL to fetch." }, status: :unprocessable_entity
+    false
+  end
+
+  def extract_image_url(data)
+    image = data["image"]
+    return nil if image.blank?
+
+    return image if image.start_with?("http://", "https://")
+
+    "https://artworks.thetvdb.com#{image}"
   end
 end

@@ -112,6 +112,11 @@ module Tvdb
       }
     end
 
+    def episode_details(episode_id)
+      response = get("/episodes/#{episode_id}")
+      response["data"] || response
+    end
+
     private
 
     attr_reader :api_key
