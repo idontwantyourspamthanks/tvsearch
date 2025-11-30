@@ -43,9 +43,10 @@ export default class extends Controller {
 
     this.played = true
     try {
+      this.stopAudio()
       const audioUrl = await this.fetchAudio(message)
       if (audioUrl) {
-        this.stopAudio()
+        this.currentUrl = audioUrl
         this.currentAudio = new Audio(audioUrl)
         this.currentAudio.addEventListener("ended", () => this.teardownAudio(audioUrl))
         this.currentAudio.addEventListener("error", () => this.teardownAudio(audioUrl))
@@ -69,7 +70,7 @@ export default class extends Controller {
     const season = data.voiceAnswerSeasonNumber
     const episode = data.voiceAnswerEpisodeNumber
 
-    let message = `It's called ${title}`
+    let message = `It's called ${title} `
     if (altTitles.length > 0) {
       message += ` aka ${altTitles[0]}`
     }
@@ -98,8 +99,7 @@ export default class extends Controller {
 
     if (!response.ok) throw new Error("Audio request failed")
     const blob = await response.blob()
-    this.currentUrl = URL.createObjectURL(blob)
-    return this.currentUrl
+    return URL.createObjectURL(blob)
   }
 
   stopAudio() {
