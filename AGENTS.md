@@ -83,10 +83,10 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - Seed data now includes emoji values for sample shows (e.g., The Office 🏢, Breaking Bad 🧪, Stranger Things 👾, Succession 💼, The Mandalorian 🛸) and populates them for existing records missing emojis.
 
 ### Voice search
-- Requires `OPENAI_KEY` env var (stored as Kamal secret) to call OpenAI Whisper.
+- Requires `OPENAI_KEY` env var (falls back to `OPENAI_API_KEY`) to call OpenAI Whisper; stored as Kamal secret.
 - POST `/voice_search` with multipart `audio` upload; responds with `{ transcript }`, 503 if the key is missing, and 502 when transcription fails.
 - `Voice::WhisperClient` (Net::HTTP) sends audio to `https://api.openai.com/v1/audio/transcriptions` with `model: whisper-1`, 10s open timeout, 45s read timeout, and raises descriptive errors.
-- Homepage search form runs Stimulus `voice_search_controller.js`: mic button records via MediaRecorder (up to 12s), shows listening/transcribing/error states, and drops the transcript into the `q` field while dispatching input/change events so live search submits automatically.
+- Homepage search form runs Stimulus `voice_search_controller.js`: mic button records via MediaRecorder (up to 12s), shows listening/transcribing/error states, and drops the transcript into the `q` field while dispatching input/change events so live search submits automatically. On desktop the mic button sits between the query box and show picker; on mobile it stacks above the inputs to avoid overflow.
 
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`

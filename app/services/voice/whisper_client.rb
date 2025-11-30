@@ -9,9 +9,10 @@ module Voice
     API_URL = URI("https://api.openai.com/v1/audio/transcriptions").freeze
     MODEL = "whisper-1".freeze
 
-    def initialize(api_key: ENV["OPENAI_KEY"])
-      @api_key = api_key
-      raise ConfigurationError, "OPENAI_KEY is missing" if @api_key.blank?
+    def initialize(api_key: nil)
+      env_key = ENV["OPENAI_KEY"].presence || ENV["OPENAI_API_KEY"].presence
+      @api_key = api_key.presence || env_key
+      raise ConfigurationError, "OPENAI_KEY/OPENAI_API_KEY is missing" if @api_key.blank?
     end
 
     def transcribe(upload)

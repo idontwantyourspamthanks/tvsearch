@@ -11,14 +11,15 @@
 
     <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results", controller: "live-search voice-search", action: "input->live-search#queue change->live-search#queue", "live-search-delay-value": 400, "voice-search-endpoint-value": voice_search_path, "voice-search-max-duration-value": 12 }, class: "search-form" do |form| %>
       <div class="search-box">
+        <button type="button" class="voice-button" data-voice-search-target="button" data-action="click->voice-search#toggle" aria-label="Start voice search" aria-pressed="false">
+          <span class="voice-icon" aria-hidden="true">🎙️</span>
+          <span class="voice-label">Voice</span>
+          <span class="voice-pulse" aria-hidden="true"></span>
+        </button>
+
         <div class="search-input-group">
           <%= form.label :q, "Search", class: "sr-only" %>
           <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true, class: "search-input", data: { "voice-search-target": "input" } %>
-          <button type="button" class="voice-button" data-voice-search-target="button" data-action="click->voice-search#toggle" aria-label="Start voice search" aria-pressed="false">
-            <span class="voice-icon" aria-hidden="true">🎙️</span>
-            <span class="voice-label">Mic</span>
-            <span class="voice-pulse" aria-hidden="true"></span>
-          </button>
         </div>
 
         <div class="show-picker" data-controller="show-picker">
