@@ -7,7 +7,7 @@ module Voice
     class ConfigurationError < Error; end
 
     API_BASE = "https://api.elevenlabs.io/v1".freeze
-    DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL".freeze # "Rachel" voice
+    DEFAULT_VOICE_ID = "NOpBlnGInO9m6vDvFkFC".freeze # "Grandpa Spuds" voice
     MODEL_ID = "eleven_multilingual_v2".freeze
 
     def initialize(api_key: nil, voice_id: DEFAULT_VOICE_ID)
@@ -34,7 +34,9 @@ module Voice
         voice_settings: { stability: 0.4, similarity_boost: 0.7 }
       }.to_json
 
-      response = http_client.request(uri, request)
+      response = http_client.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
+        http.request(request)
+      end
       raise Error, error_message(response) if response.code.to_i >= 400
 
       response.body
