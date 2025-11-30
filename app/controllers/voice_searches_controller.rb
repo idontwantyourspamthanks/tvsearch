@@ -10,8 +10,9 @@ class VoiceSearchesController < ApplicationController
     transcript = client.transcribe(audio)
 
     render json: { transcript: transcript }
-  rescue Voice::WhisperClient::ConfigurationError
-    render json: { error: "Voice search is not configured." }, status: :service_unavailable
+  rescue Voice::WhisperClient::ConfigurationError => e
+    Rails.logger.warn("Voice search configuration missing: #{e.message}")
+    render json: { error: "Voice search is not configured. #{e.message}" }, status: :service_unavailable
   rescue Voice::WhisperClient::Error => e
     Rails.logger.warn("Voice search failed: #{e.message}")
     render json: { error: e.message }, status: :bad_gateway

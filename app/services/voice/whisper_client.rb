@@ -11,8 +11,11 @@ module Voice
 
     def initialize(api_key: nil)
       env_key = ENV["OPENAI_KEY"].presence || ENV["OPENAI_API_KEY"].presence
-      @api_key = api_key.presence || env_key
-      raise ConfigurationError, "OPENAI_KEY/OPENAI_API_KEY is missing" if @api_key.blank?
+      creds_key = Rails.application.credentials.dig(:openai, :api_key) ||
+                  Rails.application.credentials[:openai_api_key] rescue nil
+
+      @api_key = api_key.presence || env_key || creds_key.presence
+      raise ConfigurationError, "OPENAI_KEY/OPENAI_API_KEY (or credentials openai.api_key) is missing" if @api_key.blank?
     end
 
     def transcribe(upload)
