@@ -65,7 +65,9 @@ export default class extends Controller {
 
   updateTrigger(emoji, name) {
     this.emojiTarget.textContent = emoji || "✳️"
-    this.nameTarget.textContent = name || "All shows"
+    const label = name || "All shows"
+    this.nameTarget.textContent = label
+    this.triggerTarget.setAttribute("aria-label", `Show filter: ${label}`)
   }
 
   markSelected(showId) {

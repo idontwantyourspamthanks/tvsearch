@@ -729,6 +729,19 @@ h1 {
     max-height: calc(100vh - 150px);
   }
 
+  @media (max-width: 480px) {
+    .show-picker-trigger {
+      padding: 10px;
+      min-width: 44px;
+      justify-content: center;
+    }
+
+    .show-picker-trigger .label,
+    .show-picker-trigger .chevron {
+      display: none;
+    }
+  }
+
   .table-row {
     grid-template-columns: 1fr;
     gap: 8px;
