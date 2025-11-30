@@ -70,17 +70,19 @@
     <% end %>
   </section>
 
-  <turbo-frame id="episode_results">
+  <turbo-frame id="episode_results" data-controller="voice-answer" data-voice-answer-endpoint-value="<%= voice_response_path %>">
     <% if @episodes.any? %>
       <ul class="episode-list">
-        <% @episodes.each do |episode| %>
+        <% @episodes.each_with_index do |episode, index| %>
           <% admin_data = {} %>
           <% if current_admin_user %>
             <% admin_data[:controller] = "episode-image" %>
             <% admin_data[:"episode-image-refresh-url-value"] = refresh_image_episode_path(episode) %>
             <% admin_data[:"episode-image-title-value"] = episode.title %>
           <% end %>
-          <li class="episode-card"<%= tag.attributes(data: admin_data) if admin_data.any? %>>
+          <% voice_data = { "voice-answer-target": "episode", "voice-answer-title": episode.title, "voice-answer-alternate-titles": (episode.alternate_titles || []).join("|"), "voice-answer-season-number": episode.season_number, "voice-answer-episode-number": episode.episode_number } %>
+          <% combined_data = admin_data.merge(voice_data) %>
+          <li class="episode-card"<%= tag.attributes(data: combined_data) if combined_data.any? %>>
             <%= link_to episode_path(episode), data: { turbo_frame: "_top" } do %>
               <div class="episode-thumbnail" data-episode-image-target="thumbnail">
                 <% if episode.display_image_url.present? %>

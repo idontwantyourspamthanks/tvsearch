@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   root "episodes#index"
   resource :voice_search, only: :create
+  resource :voice_response, only: :create
   resources :episodes, only: %i[index show] do
     post :refresh_image, on: :member
   end

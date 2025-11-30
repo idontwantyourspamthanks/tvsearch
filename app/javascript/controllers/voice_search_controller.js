@@ -152,6 +152,7 @@ export default class extends Controller {
 
     this.inputTarget.value = transcript
     this.inputTarget.focus()
+    window.sessionStorage.setItem("voice-search:active", "1")
     const end = transcript.length
     this.inputTarget.setSelectionRange(end, end)
     this.inputTarget.dispatchEvent(new Event("input", { bubbles: true }))

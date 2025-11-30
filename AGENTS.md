@@ -84,10 +84,9 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - Seed data now includes emoji values for sample shows (e.g., The Office 🏢, Breaking Bad 🧪, Stranger Things 👾, Succession 💼, The Mandalorian 🛸) and populates them for existing records missing emojis.
 
 ### Voice search
-- Requires `OPENAI_KEY` env var (falls back to `OPENAI_API_KEY` or Rails credentials `openai.api_key`) to call OpenAI Whisper; stored as Kamal secret.
-- POST `/voice_search` with multipart `audio` upload; responds with `{ transcript }`, 503 if the key is missing, and 502 when transcription fails.
-- `Voice::WhisperClient` (Net::HTTP) sends audio to `https://api.openai.com/v1/audio/transcriptions` with `model: whisper-1`, 10s open timeout, 45s read timeout, and raises descriptive errors.
-- Homepage search form runs Stimulus `voice_search_controller.js`: mic button records via MediaRecorder (up to 12s), shows listening/transcribing/error states, and drops the transcript into the `q` field while dispatching input/change events so live search submits automatically. On desktop the mic button sits between the query box and show picker; on mobile it stacks above the inputs to avoid overflow.
+- Inbound: Requires `OPENAI_KEY` env var (falls back to `OPENAI_API_KEY` or Rails credentials `openai.api_key`) to call OpenAI Whisper; stored as Kamal secret. POST `/voice_search` with multipart `audio` upload; responds with `{ transcript }`, 503 if the key is missing, and 502 when transcription fails. `Voice::WhisperClient` (Net::HTTP) sends audio to `https://api.openai.com/v1/audio/transcriptions` with `model: whisper-1`, 10s open timeout, 45s read timeout, and raises descriptive errors.
+- Outbound: Requires `ELEVEN_KEY` (falls back to `ELEVENLABS_API_KEY` or credentials `elevenlabs.api_key`) to call ElevenLabs for text-to-speech. POST `/voice_response` with `{ message }` returns `audio/mpeg` (503/502 on config/errors). `Voice::ElevenLabsClient` uses voice `EXAVITQu4vr4xnSDxMaL` (Rachel), model `eleven_multilingual_v2`, with mild stability/similarity settings.
+- Homepage search form runs Stimulus `voice_search_controller.js`: mic button records via MediaRecorder (up to 12s), shows listening/transcribing/error states, drops the transcript into the `q` field, and flags the session for voice-out. The results frame runs `voice_answer_controller.js` which, only after a voice search, speaks a summary of the first result via ElevenLabs (“It’s called <title> aka <alt> and it’s season X episode Y”). On desktop the mic button sits between the query box and show picker; on mobile it stacks above the inputs to avoid overflow.
 
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`
