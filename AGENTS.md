@@ -73,6 +73,7 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - `refresh_image` returns early after rendering errors to avoid double-render exceptions.
 
 ### Episode search
+- All search matches normalize accents using character replacements plus `I18n.transliterate`, so "cafe" will match "café" in titles/descriptions/alternate titles/show names.
 - When `q` is blank, episodes are ordered by show name, then season, then episode, then air date.
 - When `show_id` is present (with or without `q`), results keep the series/season/episode ordering.
 - When `q` is present without a selected show, ordering switches to a relevance score that prefers matches in title, then alternate titles, then description, with show/season/episode as tie-breakers.
