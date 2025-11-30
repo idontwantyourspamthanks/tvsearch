@@ -9,10 +9,17 @@
     <% selected_show = @show_id.present? ? @shows.detect { |show| show.id == @show_id.to_i } : nil %>
     <% selected_emoji = selected_show&.emoji.presence || (selected_show ? "📺" : "✳️") %>
 
-    <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results", controller: "live-search", action: "input->live-search#queue change->live-search#queue", "live-search-delay-value": 400 }, class: "search-form" do |form| %>
+    <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results", controller: "live-search voice-search", action: "input->live-search#queue change->live-search#queue", "live-search-delay-value": 400, "voice-search-endpoint-value": voice_search_path, "voice-search-max-duration-value": 12 }, class: "search-form" do |form| %>
       <div class="search-box">
-        <%= form.label :q, "Search", class: "sr-only" %>
-        <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true %>
+        <div class="search-input-group">
+          <%= form.label :q, "Search", class: "sr-only" %>
+          <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true, class: "search-input", data: { "voice-search-target": "input" } %>
+          <button type="button" class="voice-button" data-voice-search-target="button" data-action="click->voice-search#toggle" aria-label="Start voice search" aria-pressed="false">
+            <span class="voice-icon" aria-hidden="true">🎙️</span>
+            <span class="voice-label">Mic</span>
+            <span class="voice-pulse" aria-hidden="true"></span>
+          </button>
+        </div>
 
         <div class="show-picker" data-controller="show-picker">
           <%= form.hidden_field :show_id, value: @show_id, data: { "show-picker-target": "input" } %>
@@ -58,7 +65,8 @@
           </div>
         </div>
       </div>
-      <p class="hint">Filter by title, description, nickname, or show.</p>
+      <p class="hint">Filter by title, description, nickname, or show — or tap the mic to dictate with Whisper.</p>
+      <p class="hint voice-status" data-voice-search-target="status" hidden></p>
     <% end %>
   </section>
 

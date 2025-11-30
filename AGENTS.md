@@ -82,9 +82,16 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - Picker menu/backdrop respect the `hidden` attribute with explicit CSS so they start closed and can be dismissed by clicking outside/escape.
 - Seed data now includes emoji values for sample shows (e.g., The Office 🏢, Breaking Bad 🧪, Stranger Things 👾, Succession 💼, The Mandalorian 🛸) and populates them for existing records missing emojis.
 
+### Voice search
+- Requires `OPENAI_KEY` env var (stored as Kamal secret) to call OpenAI Whisper.
+- POST `/voice_search` with multipart `audio` upload; responds with `{ transcript }`, 503 if the key is missing, and 502 when transcription fails.
+- `Voice::WhisperClient` (Net::HTTP) sends audio to `https://api.openai.com/v1/audio/transcriptions` with `model: whisper-1`, 10s open timeout, 45s read timeout, and raises descriptive errors.
+- Homepage search form runs Stimulus `voice_search_controller.js`: mic button records via MediaRecorder (up to 12s), shows listening/transcribing/error states, and drops the transcript into the `q` field while dispatching input/change events so live search submits automatically.
+
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`
 - Admin controller: `app/controllers/admin/tvdb_imports_controller.rb`
 - Admin search/import page: `app/views/admin/tvdb_imports/new.html.erb`
 - Progress page + Stimulus: `app/views/admin/tvdb_imports/create.html.erb`, `app/javascript/controllers/tvdb_import_controller.js`
+- Voice search: `app/controllers/voice_searches_controller.rb`, `app/services/voice/whisper_client.rb`, `app/javascript/controllers/voice_search_controller.js`
 - Deploy: `config/deploy.yml` mounts `tv_storage:/rails/storage` and `tv_episode_images:/rails/public/episode_images` so episode image cache persists across releases.

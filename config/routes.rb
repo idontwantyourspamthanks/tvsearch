@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   root "episodes#index"
+  resource :voice_search, only: :create
   resources :episodes, only: %i[index show] do
     post :refresh_image, on: :member
   end
