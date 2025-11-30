@@ -5,9 +5,14 @@ class EpisodesController < ApplicationController
   def index
     @query = params[:q].to_s.strip
     @show_id = params[:show_id].presence
-    scope = Episode.search(@query).by_show_episode
+    scope = Episode.search(@query)
     scope = scope.where(show_id: @show_id) if @show_id
-    @episodes = scope
+
+    @episodes = if @query.present? && @show_id.blank?
+      scope.order_by_relevance(@query)
+    else
+      scope.by_show_episode
+    end
     @shows = Show.order(:name)
   end
 

@@ -72,6 +72,11 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - `require_admin!` now returns JSON `{ error }` + 401 for JSON requests (e.g., the manual image refresh) instead of HTML redirects, to avoid JSON parse errors in fetch clients when sessions expire.
 - `refresh_image` returns early after rendering errors to avoid double-render exceptions.
 
+### Episode search
+- When `q` is blank, episodes are ordered by show name, then season, then episode, then air date.
+- When `show_id` is present (with or without `q`), results keep the series/season/episode ordering.
+- When `q` is present without a selected show, ordering switches to a relevance score that prefers matches in title, then alternate titles, then description, with show/season/episode as tie-breakers.
+
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`
 - Admin controller: `app/controllers/admin/tvdb_imports_controller.rb`

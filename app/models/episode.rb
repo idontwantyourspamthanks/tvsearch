@@ -19,6 +19,28 @@ class Episode < ApplicationRecord
     )
   }
 
+  scope :order_by_relevance, lambda { |query|
+    sanitized_query = "%#{query.to_s.downcase.strip}%"
+    relevance_sql = sanitize_sql_array([
+      <<~SQL.squish, q: sanitized_query
+        CASE
+          WHEN LOWER(episodes.title) LIKE :q THEN 3
+          WHEN LOWER(episodes.alternate_titles) LIKE :q THEN 2
+          WHEN LOWER(episodes.description) LIKE :q THEN 1
+          ELSE 0
+        END
+      SQL
+    ])
+
+    left_joins(:show).order(
+      Arel.sql("#{relevance_sql} DESC"),
+      Arel.sql("LOWER(shows.name) ASC"),
+      :season_number,
+      :episode_number,
+      :aired_on
+    )
+  }
+
   def self.search(query)
     scope = left_joins(:show).includes(:show)
     return scope if query.blank?
