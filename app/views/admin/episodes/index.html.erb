@@ -30,7 +30,7 @@
       </div>
       <% @episodes.each do |episode| %>
         <div class="table-row">
-          <div><strong><%= episode.show&.name %></strong></div>
+          <div><strong><%= episode.show&.emoji.present? ? "#{episode.show.emoji} " : "" %><%= episode.show&.name %></strong></div>
           <div>
             <div><%= episode.title %></div>
             <% if episode.alternate_titles.present? %>

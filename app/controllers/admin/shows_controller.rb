@@ -54,7 +54,7 @@ class Admin::ShowsController < ApplicationController
   end
 
   def show_params
-    params.require(:show).permit(:name, :description)
+    params.require(:show).permit(:name, :description, :emoji)
   end
 
   def paginate(scope)

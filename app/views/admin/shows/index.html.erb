@@ -28,7 +28,7 @@
       </div>
       <% @shows.each do |show| %>
         <div class="table-row">
-          <div><strong><%= show.name %></strong></div>
+          <div><strong><%= show.emoji.present? ? "#{show.emoji} " : "" %><%= show.name %></strong></div>
           <div class="muted"><%= truncate(show.description.to_s, length: 120) %></div>
           <div class="table-actions">
             <%= link_to "Edit", edit_admin_show_path(show) %>

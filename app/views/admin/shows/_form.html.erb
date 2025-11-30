@@ -11,6 +11,11 @@
   <% end %>
 
   <div class="field">
+    <%= form.label :emoji %>
+    <%= form.text_field :emoji, placeholder: "e.g. 📺" %>
+  </div>
+
+  <div class="field">
     <%= form.label :name %>
     <%= form.text_field :name, required: true %>
   </div>
