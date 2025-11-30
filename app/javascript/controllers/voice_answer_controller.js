@@ -9,9 +9,7 @@ export default class extends Controller {
 
   connect() {
     this.played = false
-    if (!this.hasEpisodeTarget) return
-    if (!this.voiceSearchActive()) return
-    this.speakFirst()
+    this.maybeSpeak()
   }
 
   voiceSearchActive() {
@@ -20,6 +18,16 @@ export default class extends Controller {
 
   clearVoiceFlag() {
     window.sessionStorage.removeItem(VOICE_FLAG_KEY)
+  }
+
+  handleFrameLoad() {
+    this.played = false
+    this.maybeSpeak()
+  }
+
+  maybeSpeak() {
+    if (!this.voiceSearchActive()) return
+    this.speakFirst()
   }
 
   async speakFirst() {

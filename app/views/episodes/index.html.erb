@@ -70,7 +70,7 @@
     <% end %>
   </section>
 
-  <turbo-frame id="episode_results" data-controller="voice-answer" data-voice-answer-endpoint-value="<%= voice_response_path %>">
+  <turbo-frame id="episode_results" data-controller="voice-answer" data-action="turbo:frame-load->voice-answer#handleFrameLoad" data-voice-answer-endpoint-value="<%= voice_response_path %>">
     <% if @episodes.any? %>
       <ul class="episode-list">
         <% @episodes.each_with_index do |episode, index| %>
