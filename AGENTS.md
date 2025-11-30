@@ -80,6 +80,7 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - UI highlighting of matches is also accent-insensitive so "cafe" highlights "café" in titles, alternate titles, and descriptions.
 - Homepage show filter uses an emoji picker (Stimulus `show_picker_controller.js`) instead of a native select: the trigger shows ✳️ when no show is picked and the show emoji otherwise. Desktop opens a dropdown; mobile opens a fullscreen sheet with a backdrop. Selecting a show updates the hidden `show_id` field and dispatches input/change events so the live search Turbo frame refreshes immediately.
 - Picker menu/backdrop respect the `hidden` attribute with explicit CSS so they start closed and can be dismissed by clicking outside/escape.
+- Mobile layout for the homepage search uses a two-column grid so the text search and show picker stay on the same row; the voice button spans the full width above them. The show picker auto-sizes in its column (with a 44px min when emoji-only) so the text field can take the remaining space, and on very small widths the trigger padding shrinks while the label/chevron hide. On desktop (`min-width: 641px`) the voice control is hidden so only the text input and show selector appear; on mobile the voice button is visible and full-width in the first row.
 - Seed data now includes emoji values for sample shows (e.g., The Office 🏢, Breaking Bad 🧪, Stranger Things 👾, Succession 💼, The Mandalorian 🛸) and populates them for existing records missing emojis.
 
 ### Voice search

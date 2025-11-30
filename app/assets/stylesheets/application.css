@@ -193,6 +193,42 @@ h1 {
   order: 2;
 }
 
+@media (max-width: 640px) {
+  .search-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .voice-button {
+    grid-column: 1 / -1;
+    order: 0;
+    width: 100%;
+  }
+
+  .search-input-group {
+    grid-column: 1 / 2;
+  }
+
+  .show-picker {
+    grid-column: 2 / 3;
+    min-width: 44px;
+  }
+
+  .show-picker-trigger {
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (min-width: 641px) {
+  .voice-button {
+    display: none;
+  }
+}
+
 .voice-button .voice-icon {
   font-size: 18px;
 }
@@ -809,27 +845,6 @@ h1 {
     margin-right: 12px;
   }
 
-  .search-box {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .search-input-group,
-  .show-picker,
-  .voice-button {
-    width: 100%;
-  }
-
-  .voice-button {
-    order: -1;
-  }
-
-  .show-picker-trigger {
-    width: auto;
-    min-width: 0;
-  }
-
   .show-picker-menu {
     position: fixed;
     inset: 12px;
@@ -844,8 +859,17 @@ h1 {
   }
 
   @media (max-width: 480px) {
+    .search-box {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .show-picker {
+      grid-column: 2 / 3;
+      min-width: 44px;
+    }
+
     .show-picker-trigger {
-      padding: 10px;
+      padding: 8px 10px;
       min-width: 44px;
       justify-content: center;
     }
