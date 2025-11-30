@@ -77,6 +77,7 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - When `q` is blank, episodes are ordered by show name, then season, then episode, then air date.
 - When `show_id` is present (with or without `q`), results keep the series/season/episode ordering.
 - When `q` is present without a selected show, ordering switches to a relevance score that prefers matches in title, then alternate titles, then description, with show/season/episode as tie-breakers.
+- UI highlighting of matches is also accent-insensitive so "cafe" highlights "café" in titles, alternate titles, and descriptions.
 
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`
