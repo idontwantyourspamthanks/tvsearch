@@ -45,8 +45,11 @@ export default class extends Controller {
     try {
       const audioUrl = await this.fetchAudio(message)
       if (audioUrl) {
-        const audio = new Audio(audioUrl)
-        audio.play().catch(() => {})
+        this.stopAudio()
+        this.currentAudio = new Audio(audioUrl)
+        this.currentAudio.addEventListener("ended", () => this.teardownAudio(audioUrl))
+        this.currentAudio.addEventListener("error", () => this.teardownAudio(audioUrl))
+        this.currentAudio.play().catch(() => this.teardownAudio(audioUrl))
       }
     } catch (error) {
       console.warn("Voice playback failed", error)
@@ -95,6 +98,27 @@ export default class extends Controller {
 
     if (!response.ok) throw new Error("Audio request failed")
     const blob = await response.blob()
-    return URL.createObjectURL(blob)
+    this.currentUrl = URL.createObjectURL(blob)
+    return this.currentUrl
+  }
+
+  stopAudio() {
+    if (this.currentAudio) {
+      this.currentAudio.pause()
+      this.currentAudio.currentTime = 0
+      this.currentAudio = null
+    }
+    if (this.currentUrl) {
+      URL.revokeObjectURL(this.currentUrl)
+      this.currentUrl = null
+    }
+  }
+
+  teardownAudio(url) {
+    if (this.currentUrl === url) {
+      this.stopAudio()
+    } else {
+      URL.revokeObjectURL(url)
+    }
   }
 }

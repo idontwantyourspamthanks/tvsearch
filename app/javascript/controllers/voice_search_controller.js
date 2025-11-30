@@ -133,12 +133,13 @@ export default class extends Controller {
       }
 
       const transcript = (data.transcript || "").trim()
-      if (transcript.length === 0) {
+      const cleaned = this.cleanTranscript(transcript)
+      if (cleaned.length === 0) {
         throw new Error("We didn't get any text back. Please try again.")
       }
 
-      this.applyTranscript(transcript)
-      this.setStatus(`Filled from voice: “${this.truncate(transcript)}”`, "success")
+      this.applyTranscript(cleaned)
+      this.setStatus(`Filled from voice: “${this.truncate(cleaned)}”`, "success")
     } catch (error) {
       this.fail(error.message)
     } finally {
@@ -234,5 +235,10 @@ export default class extends Controller {
 
   truncate(text, length = 80) {
     return text.length > length ? `${text.slice(0, length - 1)}…` : text
+  }
+
+  cleanTranscript(text) {
+    // Drop trailing punctuation Whisper often adds, and normalize spacing
+    return text.replace(/[.,!?]+$/g, "").replace(/\s+/g, " ").trim()
   }
 }
