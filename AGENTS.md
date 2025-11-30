@@ -78,6 +78,9 @@ This documents how we fetch and import data from TVDB so future changes are easi
 - When `show_id` is present (with or without `q`), results keep the series/season/episode ordering.
 - When `q` is present without a selected show, ordering switches to a relevance score that prefers matches in title, then alternate titles, then description, with show/season/episode as tie-breakers.
 - UI highlighting of matches is also accent-insensitive so "cafe" highlights "café" in titles, alternate titles, and descriptions.
+- Homepage show filter uses an emoji picker (Stimulus `show_picker_controller.js`) instead of a native select: the trigger shows ✳️ when no show is picked and the show emoji otherwise. Desktop opens a dropdown; mobile opens a fullscreen sheet with a backdrop. Selecting a show updates the hidden `show_id` field and dispatches input/change events so the live search Turbo frame refreshes immediately.
+- Picker menu/backdrop respect the `hidden` attribute with explicit CSS so they start closed and can be dismissed by clicking outside/escape.
+- Seed data now includes emoji values for sample shows (e.g., The Office 🏢, Breaking Bad 🧪, Stranger Things 👾, Succession 💼, The Mandalorian 🛸) and populates them for existing records missing emojis.
 
 ### Key files
 - TVDB client: `app/services/tvdb/client.rb`

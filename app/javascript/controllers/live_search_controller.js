@@ -35,7 +35,7 @@ export default class extends Controller {
     if (this.submittedOnConnect) return false
 
     const queryField = this.element.querySelector('input[name="q"]')
-    const showSelect = this.element.querySelector('select[name="show_id"]')
+    const showSelect = this.element.querySelector('[name="show_id"]')
 
     const hasQuery = queryField && queryField.value.trim().length > 0
     const hasShowFilter = showSelect && showSelect.value && showSelect.value.trim().length > 0

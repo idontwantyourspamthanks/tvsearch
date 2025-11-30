@@ -6,11 +6,57 @@
     <h1>Search a curated set of episodes</h1>
     <p class="lede">Type a show name, episode title, or a plot detail to look up the episodes we currently track.</p>
 
+    <% selected_show = @show_id.present? ? @shows.detect { |show| show.id == @show_id.to_i } : nil %>
+    <% selected_emoji = selected_show&.emoji.presence || (selected_show ? "📺" : "✳️") %>
+
     <%= form_with url: root_path, method: :get, data: { turbo_frame: "episode_results", controller: "live-search", action: "input->live-search#queue change->live-search#queue", "live-search-delay-value": 400 }, class: "search-form" do |form| %>
       <div class="search-box">
         <%= form.label :q, "Search", class: "sr-only" %>
         <%= form.search_field :q, value: @query, placeholder: "e.g. Dinner Party, plane crash, Hawkins lab", autofocus: true %>
-        <%= form.collection_select :show_id, @shows, :id, :name, { include_blank: "All shows" }, { class: "select" } %>
+
+        <div class="show-picker" data-controller="show-picker">
+          <%= form.hidden_field :show_id, value: @show_id, data: { "show-picker-target": "input" } %>
+          <button type="button" class="show-picker-trigger" data-show-picker-target="trigger" data-action="click->show-picker#toggle">
+            <span class="emoji" data-show-picker-target="emoji"><%= selected_emoji %></span>
+            <span class="label">
+              <span class="muted small">Show</span>
+              <strong data-show-picker-target="name"><%= selected_show&.name || "All shows" %></strong>
+            </span>
+            <span class="chevron">▾</span>
+          </button>
+
+          <div class="show-picker-backdrop" data-show-picker-target="backdrop" data-action="click->show-picker#close" hidden></div>
+          <div class="show-picker-menu" data-show-picker-target="menu" hidden>
+            <div class="show-picker-header">
+              <div>
+                <p class="eyebrow">Filter</p>
+                <strong>Pick a show</strong>
+              </div>
+              <button type="button" class="icon-button" aria-label="Close show picker" data-action="click->show-picker#close">✕</button>
+            </div>
+            <div class="show-picker-options">
+              <button type="button" class="show-picker-option" data-id="" data-name="All shows" data-emoji="✳️" data-action="click->show-picker#select" data-show-picker-target="option">
+                <span class="emoji">✳️</span>
+                <div>
+                  <strong>All shows</strong>
+                  <p class="muted small">Search across everything</p>
+                </div>
+              </button>
+
+              <% @shows.each do |show| %>
+                <button type="button" class="show-picker-option" data-id="<%= show.id %>" data-name="<%= show.name %>" data-emoji="<%= show.emoji.presence || "📺" %>" data-action="click->show-picker#select" data-show-picker-target="option">
+                  <span class="emoji"><%= show.emoji.presence || "📺" %></span>
+                  <div>
+                    <strong><%= show.name %></strong>
+                    <% if show.description.present? %>
+                      <p class="muted small"><%= truncate(show.description, length: 80) %></p>
+                    <% end %>
+                  </div>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
       </div>
       <p class="hint">Filter by title, description, nickname, or show.</p>
     <% end %>

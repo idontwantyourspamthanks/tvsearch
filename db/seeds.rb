@@ -6,14 +6,19 @@ AdminUser.find_or_create_by!(email: admin_email) do |admin|
 end
 
 shows = [
-  { name: "The Office", description: "A mockumentary on the everyday lives of office coworkers." },
-  { name: "Breaking Bad", description: "A chemistry teacher turns to making meth to secure his family’s future." },
-  { name: "Stranger Things", description: "Kids uncover a supernatural mystery in Hawkins, Indiana." },
-  { name: "Succession", description: "The Roy family battles for control of a media empire." },
-  { name: "The Mandalorian", description: "A lone bounty hunter protects a mysterious child in the Star Wars galaxy." }
+  { name: "The Office", emoji: "🏢", description: "A mockumentary on the everyday lives of office coworkers." },
+  { name: "Breaking Bad", emoji: "🧪", description: "A chemistry teacher turns to making meth to secure his family’s future." },
+  { name: "Stranger Things", emoji: "👾", description: "Kids uncover a supernatural mystery in Hawkins, Indiana." },
+  { name: "Succession", emoji: "💼", description: "The Roy family battles for control of a media empire." },
+  { name: "The Mandalorian", emoji: "🛸", description: "A lone bounty hunter protects a mysterious child in the Star Wars galaxy." }
 ]
 
-shows.each { |attrs| Show.find_or_create_by!(name: attrs[:name]) { |show| show.description = attrs[:description] } }
+shows.each do |attrs|
+  show = Show.find_or_initialize_by(name: attrs[:name])
+  show.description ||= attrs[:description]
+  show.emoji ||= attrs[:emoji]
+  show.save!
+end
 
 episodes = [
   {
