@@ -63,15 +63,14 @@ class Episode < ApplicationRecord
     return scope if query.blank?
 
     sanitized_query = "%#{I18n.transliterate(query.to_s).downcase.strip}%"
-    scope.where(
-      <<~SQL.squish,
-        #{normalized_field_sql("episodes.title")} LIKE :q OR
-        #{normalized_field_sql("episodes.description")} LIKE :q OR
-        #{normalized_field_sql("shows.name")} LIKE :q OR
-        #{normalized_field_sql("episodes.alternate_titles")} LIKE :q
-      SQL
-      q: sanitized_query
-    )
+    search_sql = %w[
+      episodes.title
+      episodes.description
+      shows.name
+      episodes.alternate_titles
+    ].map { |field| "#{normalized_field_sql(field)} LIKE :q" }.join(" OR ")
+
+    scope.where(sanitize_sql_array([ search_sql, { q: sanitized_query } ]))
   end
 
   def alternate_titles_text

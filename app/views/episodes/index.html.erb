@@ -97,7 +97,7 @@
                 <% if episode.alternate_titles.present? %>
                   <p class="muted small">
                     Also called:
-                    <%= episode.alternate_titles.map { |alt| highlight_query(alt, @query) }.join(", ").html_safe %>
+                    <%= safe_join(episode.alternate_titles.map { |alt| highlight_query(alt, @query) }, ", ") %>
                   </p>
                 <% end %>
                 <p class="muted">

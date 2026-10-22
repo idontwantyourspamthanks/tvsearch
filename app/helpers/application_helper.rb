@@ -1,10 +1,10 @@
 module ApplicationHelper
   def highlight_query(text, query)
-    return text unless query.present? && text.present?
+    return ERB::Util.html_escape(text) unless query.present? && text.present?
 
     normalized_text = accent_insensitive_normalize(text)
     normalized_query = accent_insensitive_normalize(query)
-    return text if normalized_query.blank?
+    return ERB::Util.html_escape(text) if normalized_query.blank?
 
     ranges = []
     search_from = 0
@@ -12,7 +12,7 @@ module ApplicationHelper
       ranges << (pos...(pos + normalized_query.length))
       search_from = pos + normalized_query.length
     end
-    return text if ranges.empty?
+    return ERB::Util.html_escape(text) if ranges.empty?
 
     highlighted = +""
     in_mark = false
