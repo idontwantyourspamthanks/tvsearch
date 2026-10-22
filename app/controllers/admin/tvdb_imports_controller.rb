@@ -115,7 +115,7 @@ class Admin::TvdbImportsController < ApplicationController
         status = :skipped
       end
 
-      reason_parts = [persistence[:reason], image_result[:reason]].compact
+      reason_parts = [ persistence[:reason], image_result[:reason] ].compact
       reason = reason_parts.present? ? reason_parts.join(" · ") : default_reason_for(status)
 
       { episode:, status:, reason:, image_action: image_result[:action] }

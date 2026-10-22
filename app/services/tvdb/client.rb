@@ -177,14 +177,14 @@ module Tvdb
       body = response.body.to_s
 
       begin
-        return JSON.parse(body)
+        JSON.parse(body)
       rescue JSON::ParserError
         # Try again after forcing UTF-8 and replacing invalid/undefined bytes
         safe_body = body.dup.force_encoding(Encoding::UTF_8)
         if !safe_body.valid_encoding?
           safe_body = safe_body.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: "?")
         end
-        return JSON.parse(safe_body)
+        JSON.parse(safe_body)
       rescue JSON::ParserError => e
         snippet = body.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: "?")[0, 500]
         raise Error, "Unexpected response format (#{uri}, status #{response.code}): #{e.message} — body: #{snippet}"

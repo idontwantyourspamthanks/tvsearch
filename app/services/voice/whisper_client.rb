@@ -68,9 +68,9 @@ module Voice
 
     def form_data(file)
       [
-        ["model", MODEL],
-        ["file", file[:io], { filename: file[:filename], content_type: file[:content_type] }],
-        ["response_format", "json"]
+        [ "model", MODEL ],
+        [ "file", file[:io], { filename: file[:filename], content_type: file[:content_type] } ],
+        [ "response_format", "json" ]
       ]
     end
 
